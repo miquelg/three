@@ -18,6 +18,8 @@ Bussiness layer classes for metadata and bussiness logic
 
 ### Records
 
+Contain the actual data pushed and pulled from DB, that can be binded to UI Controls and later sync with DB.
+
 - Generated automatically from Models
 - Shared among client and server
 - Actual ORM classes to interact with
@@ -26,12 +28,16 @@ Bussiness layer classes for metadata and bussiness logic
 
 ### Components
 
+Server code for UI. Mainly declarative. Used to render the HTML that are sent to the client.
+
 - Contain the server code for the Controls
 - Exist on client in form of Control
 - Mainly used for rendering basic HTML, that will be managed on client by the corresponding Control class
 - Components can be based on other Components, or can render HTML directly
 
 ### Controls
+
+Client code for UI Controls. Used for low level components and also contains the application presentation logic.
 
 - Contain the presentation logic of the application
 - Can be simple controls: textbox, select, checkbox, grid or a whole form
