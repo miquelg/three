@@ -19,7 +19,7 @@
         },
 
         render: function(innerHTML) {
-	    return "<div>" + innerHTML + "</div>";
+            return "<div>" + innerHTML + "</div>";
         }
 
     };
