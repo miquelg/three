@@ -5,12 +5,6 @@ My goal is to write and MVC framework that will be used for writing CRUD applica
 
 Components used:
 
-
-node.js
-- http://nodejs.org
-
-express
-- http://expressjs.com
-
-mysql-libmysqlclient
-- https://github.com/Sannis/node-mysql-libmysqlclient
+node.js - http://nodejs.org
+express - http://expressjs.com
+mysql-libmysqlclient - https://github.com/Sannis/node-mysql-libmysqlclient
