@@ -22,7 +22,7 @@
                 }
         };
 
-        bussinessMethod1 = function(actor) {
+        bussinessMethod1: function(actor) {
             actor.first_name = "Kevin";
             actor.last_name = "Bacon";
         };
