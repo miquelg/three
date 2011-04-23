@@ -1,6 +1,6 @@
 #### Component example
 
-(actor.js)
+(actor_component.js)
 
     var c = require('components');
 
