@@ -18,8 +18,8 @@
 
     // Iterate properties
     actor2.forEachProperty(function(name) {
-        actor2 = null;
-    };
+        actor2[name] = null;
+    });
 
     // Flush store
     store.flush();
