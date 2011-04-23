@@ -1,8 +1,14 @@
-module.exports = {
+#### Model example
 
-    create: function() {
+(actor.js)
 
-		return new t.Record({
+    var t = require('types');
+
+    module.exports = {
+
+        create: function() {
+
+            return new t.Record({
 			table: "actor",
 			pk: "actor_id",
 			properties: {
@@ -20,4 +26,4 @@ module.exports = {
 	bussinessMethod1 = function(record) {
 	};
 
-};
+    };
