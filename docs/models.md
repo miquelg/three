@@ -25,5 +25,5 @@
         bussinessMethod1 = function(record) {
         };
 
-   };
+    };
 
