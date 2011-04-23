@@ -1,12 +1,10 @@
 #### Component example
 
-(actor_component.js)
+(actor_form.js)
 
     var c = require('components');
 
-    module.exports = {
-
-        create: function() {
+    ActorForm = function() {
 
             return new c.Form({
                 title: "Actor detail",
@@ -18,8 +16,8 @@
             });
         },
 
-        render: function(innerHTML) {
+    ActorForm.prototype.render = function(innerHTML, bindValue, bindType) {
             return "<div>" + innerHTML + "</div>";
-        }
+    }
 
-    };
+    exports.ActorForm = ActorForm;
