@@ -4,7 +4,7 @@
 
     var c = require('components');
 
-    exports.ActorForm = function() {
+    ActorForm = function() {
 
             return new c.Form({
                 title: "Actor detail",
@@ -16,8 +16,8 @@
             });
         },
 
-    exports.ActorForm.render: function(innerHTML, bindValue, bindType) {
+    ActorForm.prototype.render = function(innerHTML, bindValue, bindType) {
             return "<div>" + innerHTML + "</div>";
-        }
+    }
 
-    };
+    exports.ActorForm = ActorForm;
