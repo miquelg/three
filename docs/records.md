@@ -14,6 +14,9 @@
     // Load a collection of actors
     var col = Actor.loadCollection("first_name = 'Kevin'");
 
+    // Load a relation
+    actor2.loadPath("films_actors");
+
     // Load and iterate collection
     actor2.films_actors.forEachRecord(function(film_actor) {
         film_actor.film.name = "xxx";
