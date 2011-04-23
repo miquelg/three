@@ -20,6 +20,7 @@
                      "film_debutted": t.Relation1({ model: "film", own: "film_debutted_id" }),
                      "films_actors": t.RelationN({ model: "film_actor", other: "actor_id" })
                 }
+            });
         },
 
         bussinessMethod1: function(actor) {
