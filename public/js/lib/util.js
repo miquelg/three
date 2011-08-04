@@ -1,4 +1,12 @@
-isBrowser = true;
+// http://stackoverflow.com/questions/5199126/javascript-object-create-not-working-in-firefox/5199135#5199135
+//
+if (typeof Object.create === 'undefined') {
+    Object.create = function (o) { 
+        function F() {} 
+        F.prototype = o; 
+        return new F(); 
+    };
+}
 
 inherits = function (ctor, superCtor) {
     ctor.super_ = superCtor;
@@ -9,4 +17,3 @@ inherits = function (ctor, superCtor) {
         }
     });
 };
-

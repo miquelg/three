@@ -1,0 +1,45 @@
+<html>
+<head>
+<script type="text/javascript" src="js/lib/util.js" ></script>
+<script type="text/javascript" src="js/lib/EventEmitter.js" ></script>
+<script type="text/javascript" src="js/lib/shared/types.js" ></script>
+<script type="text/javascript" src="js/lib/shared/record.js" ></script>
+<script type="text/javascript" src="js/lib/shared/model.js" ></script>
+<script type="text/javascript" src="js/lib/shared/component.js" ></script>
+</head>
+<body>
+Hola1
+
+<script>
+
+var t = types;
+var c = components;
+
+var Actor = new Model(t.RecordType({
+    table: "actor",
+    pk: "actor_id",
+    properties: {
+        "actor_id": t.Number(5),
+        "first_name": t.String(45),
+        "last_name": t.String(45),
+        "last_update": t.Date(),
+        "film_debutted_id": t.Number(5),
+        "film_debutted": t.Relation1({ model: "film", own: "film_debutted_id" }),
+        "films_actors": t.RelationN({ model: "film_actor", other: "actor_id" })
+    }
+})).getRecordClass();
+
+var theActor = new Actor({first_name: "Pepe", film_debutted_id: 98132});
+
+var input = new c.Input({id: "first_name"});
+input.setBinding(theActor, "first_name");
+alert(input.render());
+
+input = new c.Input({id: "film_debutted_id"});
+input.setBinding(theActor, "film_debutted_id");
+alert(input.render());
+
+</script>
+
+</body>
+</html>
