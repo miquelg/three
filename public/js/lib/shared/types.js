@@ -69,7 +69,7 @@ RecordType = function(options) {
 };
 inherits(RecordType, Type);
 RecordType.prototype.isRecordType = true;
-exports.RecordType = function(options) { return new RecordType(options); };
+exports.Record = function(options) { return new RecordType(options); };
 
 RecordType.prototype.getProperties = function() {
 	return this.properties;

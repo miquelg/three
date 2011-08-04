@@ -1,10 +1,9 @@
-if (!isBrowser) {
+if (exports) {
     var inherits = require('sys').inherits;
     var EventEmitter = require('events').EventEmitter;
 }
 else {
     window.components = {};     // TODO: rename with lib name
-    var exports = window.components;
 }
 
 // Simple JavaScript Templating
@@ -60,7 +59,7 @@ else {
   };
 })();
 
-(function() {   // Open closure
+(function(exports) {   // Open closure
 
 
 // template
@@ -76,8 +75,8 @@ else {
 // Create a component from id and its options
 var Component = function(options) {
   EventEmitter.call(this);
-  this.options_ = options || {};                // de-jsonify (recordfy)?
-  if (options.id) this.setId(options.id);       // Set internally rather than externally
+  this.options_ = options || {};                        // de-jsonify (recordfy)?
+  if (options && options.id) this.setId(options.id);    // Set internally rather than externally
 };
 inherits(Component, EventEmitter);
 Component.prototype.isComponent = true;
@@ -105,6 +104,10 @@ Component.prototype.setOption = function(optionName, optionValue, paint) {
   }
 };
 
+Component.prototype.getOption = function(optionName) {
+    return this.options_[optionName];
+};
+
 Component.prototype.setBinding = function(record, propertyName) {   // propertyName optional if we bind to the whole record
     this.record_ = record;
     this.propertyName_ = propertyName;
@@ -120,32 +123,42 @@ Component.prototype.getPropertyName = function() {
 
 // Client side methods
 
-if (isBrowser) {
-    
-    Component.prototype.getElement = function() {
-        return document.getElementById(this.id_);
-    };
-    
-    Component.prototype.paint = function() {
-        // Render HTML
-        var html = this.render();
-        // Inject HTML
-	    var element = this.getElement();
-	    element.innerHTML = html;
-    };
-}
+Component.prototype.getElement = function() {
+    return document.getElementById(this.id_);
+};
+
+Component.prototype.paint = function() {
+    // Render HTML
+    var html = this.render();
+    // Inject HTML
+    var element = this.getElement();
+    element.innerHTML = html;
+};
+
+Component.prototype.template = function() {
+    return "";
+};
+
+Component.frameTemplate = tmpl(
+    "<div class='control' style='width:<%= getOption(\"width\") %>;'><div>" +
+        "<%= template(obj) %>" + 
+    "</div></div>"
+);
+
+Component.prototype.render = function() {
+    return Component.frameTemplate(this);
+};
 
 // To be overridden
 
-Component.prototype.render = function() {};
 Component.prototype.getOptionsModel = function() {};
 Component.prototype.getOptionsComponent = function() {};
 
 // MultiComponent - Component composed from multiple components
 
 var MultiComponent = function(options, children) {
+  this.children_ = children || []; 
   Component.call(this, options);
-  this.children_ = children || {}; 
 };
 inherits(MultiComponent, Component);
 
@@ -155,29 +168,33 @@ MultiComponent.prototype.getChildren = function() {
 
 MultiComponent.prototype.forEachChild = function(callback) {
     var children = this.getChildren();
-    for (var childName in children) {
-        if (children.hasOwnProperty(childName)) {
-            var child = children[childName];
-            callback(childName, children[childName]);
-        }
+    for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        callback(child.getId(), child);
     }
 };
 
 MultiComponent.prototype.render = function() {
+    var html = "";
     this.forEachChild(function(childName, child) {
-        child.render();
+        html += child.render();
     });
+    return html;
 };
 
+// TODO: THIS DOESN'T WORK WITH MULTIPLE CALLINGS! 
 MultiComponent.prototype.setId = function(id) {
     Component.prototype.setId.call(this, id);
-    this.forEachChild(function(childName, child) {
+    /*this.forEachChild(function(childName, child) {
         child.setId(id + "." + childName);          // Prefix it with parent id
-    });
+    });*/
 };
 
+// TODO: not efficient
 MultiComponent.prototype.getChildFromName = function(name) {
-    return this.getChildren()[name];
+    this.forEachChild(function(childName, child) {
+        if (childName == name) return child;
+    });
 };
 MultiComponent.prototype.ctrl = MultiComponent.prototype.getChildFromName;      // alias
 
@@ -188,65 +205,86 @@ var Input = function(options) {
 };
 inherits(Input, Component);
 
-Input.prototype.render = function() {
-    var renderInput = tmpl(
-        "<input id='<%=getId()%>' " +
-        "<% if (getRecord().getPropertyType(getPropertyName()).isNumber) { %>" +
-            " style='textAlign:right;' " +
-        "<% } %>" +
-        "value='<%=getRecord().get(getPropertyName())%>' />"
-    );
-    return renderInput(this);
-};
+exports.Input = function(options) { return new Input(options); };
+
+Input.prototype.template = tmpl(
+    "<input id='<%=getId()%>' " +
+    "<% if (getRecord().getPropertyType(getPropertyName()).isNumber) { %>" +
+        " style='text-align:right;' " +
+    "<% } %>" +
+    "value='<%=getRecord().get(getPropertyName())%>' />"
+);
+
+/*Input.prototype.render = function() {
+    return this.template(this);
+}*/
 
 // Input - client side methods
 
-if (isBrowser) {
+Input.prototype.getValue = function() {
+    var value = this.getElement().value;
+    return value;	
+};
 
-    Input.prototype.getValue = function() {
-        var value = this.getElement().value;
-        return value;	
-    };
+Input.prototype.setValue = function(value) {
+    this.getElement().value = value;
+};
+
+Input.prototype.bind = function() {
     
-    Input.prototype.setValue = function(value) {
-        this.getElement().value = value;
-    };
-    
-    Input.prototype.bind = function() {
+    // var id = this.getId();
+    var element = this.getElement();
+    var record = this.getRecord();
+    var propertyName = this.getPropertyName();
+    var this_ = this;
+
+    record.on(propertyName, function() {
+        this_.setValue(record.getF(propertyName));
+        record.set(propertyName, this_.getValue());			    // Reassing value (getF may have converted the value)
+    });
         
-        // var id = this.getId();
-        var element = this.getElement();
-        var record = this.getRecord();
-        var propertyName = this.getPropertyName();
-        var this_ = this;
-
-        record.on(propertyName, function() {
-            this_.setValue(record.getF(propertyName));
-            record.set(propertyName, this_.getValue());			    // Reassing value (getF may have converted the value)
-        });
-            
-        element.onchange = function() {
-            if (this_.getValue() != record.get(propertyName)) {		// Only when really changes
-                // Record.newTransaction();
-                record.set(propertyName, this_.getValue());			// Conversions already handled by set
-            }
-        };
-
+    element.onchange = function() {
+        if (this_.getValue() != record.get(propertyName)) {		// Only when really changes
+            // Record.newTransaction();
+            record.set(propertyName, this_.getValue());			// Conversions already handled by set
+        }
     };
-    
-}
 
-exports.Input = Input;
+};
+
+
+// NewLine
+
+var NewLine = function(options) {
+  Component.call(this, options);
+};
+inherits(NewLine, Component);
+
+exports.NewLine = function(options) { return new NewLine(options); };
+
+NewLine.prototype.render = function() {
+    return "<br/>"; // Not in frame
+};
+
 
 // Form
 
 var Form = function(options, children) {
-  MultiComponent.call(this, options);
-  this.children_ = children || {}; 
+  MultiComponent.call(this, options, children);
 };
 inherits(Form, MultiComponent);
 
-exports.Form = Form;
+exports.Form = function(options, children) { return new Form(options, children); };
 
-})();
+Form.prototype.setBinding = function(record, propertyMap) {
+    MultiComponent.prototype.setBinding.call(this, record);
+    this.forEachChild(function(childName, child) {
+        // Lookup property name on passed property map
+        // By default bind each child with the same named property
+        child.setBinding(record, propertyMap && propertyMap[childName] ? propertyMap[childName] : childName);
+    });
+};
+
+
+})(exports ? exports : window.components);
 
