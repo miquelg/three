@@ -1,44 +1,76 @@
 <html>
 <head>
     <title>Three - single page</title>
-    <link href="css/three2.css" rel="stylesheet" type="text/css">
+    <!-- link href="css/three2.css" rel="stylesheet" type="text/css" -->
+    <link href="css/three2light.css" rel="stylesheet" type="text/css">
 </head>
 <body>
         <div class="topbar">
             <div class="toggle">Sakila</div>
             <div class="user">Usuario</div>
         </div>
-        <div class="navigation"><div>
+        <div id="navigator" class="navigation">
             <ul>
-                <li><a href="#">Uno</a></li>
-                <li><a href="#">Dos</a></li>
-                <li><a href="#">Tres</a></li>
-                <li><a href="#">Cuatro</a></li>
-                <li><a href="#">Uno</a></li>
-                <li><a href="#">Dos</a></li>
-                <li><a href="#">Tres</a></li>
-                <li><a href="#">Cuatro</a></li>
-                <li><a href="#">Uno</a></li>
-                <li><a href="#">Dos</a></li>
-                <li><a href="#">Tres</a></li>
-                <li><a href="#">Cuatro</a></li>
-                <li><a href="#">Uno</a></li>
-                <li><a href="#">Dos</a></li>
-                <li><a href="#">Tres</a></li>
-                <li><a href="#">Cuatro</a></li>
-                <li><a href="#">Uno</a></li>
-                <li><a href="#">Dos</a></li>
-                <li><a href="#">Tres</a></li>
-                <li><a href="#">Cuatro</a></li>
-                <li><a href="#">Uno</a></li>
-                <li><a href="#">Dos</a></li>
-                <li><a href="#">Tres</a></li>
-                <li><a href="#">Cuatro</a></li>
-                <li><a href="#">Uno</a></li>
-                <li><a href="#">Dos</a></li>
-                <li><a href="#">Tres</a></li>
-                <li><a href="#">Cuatro</a></li>
+                <li><a href="#"><span class="num">123</span>Uno</a></li>
+                <li><a href="#"><span class="num">1234</span>Dos</a></li>
+                <li><a href="#"><span class="num">123</span>Tres</a></li>
+                <li><a href="#"><span class="num">123</span>Cuatro</a></li>
+                <li><a href="#"><span class="num">123</span>Uno</a></li>
+                <li><a href="#"><span class="num">5123</span>Dos</a></li>
+                <li><a href="#"><span class="num">123</span>Tres</a></li>
+                <li><a href="#"><span class="num">6123</span>Cuatro</a></li>
+                <li><a href="#"><span class="num">7123</span>Uno</a></li>
+                <li><a href="#"><span class="num">123</span>Dos</a></li>
+                <li><a href="#"><span class="num">123</span>Tres</a></li>
+                <li><a href="#"><span class="num">123</span>Cuatro</a></li>
+                <li><a href="#"><span class="num">123</span>Uno</a></li>
+                <li><a href="#"><span class="num">6123</span>Dos</a></li>
+                <li><a href="#"><span class="num">123</span>Tres</a></li>
+                <li><a href="#"><span class="num">53</span>Cuatro</a></li>
+                <li><a href="#"><span class="num">123</span>Uno</a></li>
+                <li><a href="#"><span class="num">3</span>Dos</a></li>
+                <li><a href="#"><span class="num">123</span>Tres</a></li>
+                <li><a href="#"><span class="num">6123</span>Cuatro</a></li>
+                <li><a href="#"><span class="num">123</span>Uno</a></li>
+                <li><a href="#"><span class="num">65123</span>Dos</a></li>
+                <li><a href="#"><span class="num">123</span>Tres</a></li>
+                <li><a href="#"><span class="num">123</span>Cuatro</a></li>
+                <li><a href="#"><span class="num">123</span>Uno</a></li>
+                <li><a href="#"><span class="num">123</span>Dos</a></li>
+                <li><a href="#"><span class="num">123</span>Tres</a></li>
+                <li><a href="#"><span class="num">123</span>Cuatro</a></li>
             </ul>
-        </div></div>
+        </div>
 </body>
 </html>
+
+<script>
+
+// http://stackoverflow.com/questions/43044/algorithm-to-randomly-generate-an-aesthetically-pleasing-color-palette
+
+function generateRandomColor(mixRed, mixGreen, mixBlue) {
+    
+    var red =  Math.random() * 256;
+    var green =  Math.random() * 256;
+    var blue =  Math.random() * 256;
+    
+    mixRed = mixRed || 255;
+    mixGreen = mixGreen || 255;
+    mixBlue = mixBlue || 255;
+    
+    red = Math.floor((red + mixRed) / 2);
+    green = Math.floor((green + mixGreen) / 2);
+    blue = Math.floor((blue + mixBlue) / 2);
+
+    return "#" + red.toString(16) + green.toString(16) + blue.toString(16);
+}
+
+var nums = document.getElementById("navigator").getElementsByTagName("span");
+for (var i = 0; i < nums.length; i++) {
+    var num = nums[i];
+    num.style.backgroundColor = generateRandomColor(255, 200, 200);
+    // num.style.display = "none";
+}
+
+</script>
+
