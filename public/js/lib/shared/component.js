@@ -74,19 +74,34 @@ else {
 
 // Create a component from id and its options
 var Component = function(options) {
-  EventEmitter.call(this);
-  this.options_ = options || {};                        // de-jsonify (recordfy)?
-  if (options && options.id) this.setId(options.id);    // Set internally rather than externally
+    EventEmitter.call(this);
+    this.options_ = options || {};                              // de-jsonify (recordfy)?
+    if (options && options.name) this.setName(options.name);  // Set internally rather than externally
+    this.parent_ = null;                                     // Parent (none by default)
+    
 };
 inherits(Component, EventEmitter);
 Component.prototype.isComponent = true;
 
-Component.prototype.getId = function() {
-  return this.id_;
+Component.prototype.getName = function() {
+  return this.name_;
 };
 
-Component.prototype.setId = function(id) {
-  this.id_ = id;
+Component.prototype.setName = function(name) {
+  this.name_ = name;
+};
+
+Component.prototype.getParent = function() {
+  return this.parent_;
+};
+
+Component.prototype.setParent = function(parent) {
+  this.parent_ = parent;
+};
+
+Component.prototype.getId = function() {
+    var parent = this.getParent();
+    return parent ? parent.getId() + "." + this.getName() : this.getName();
 };
 
 Component.prototype.getOptions = function() {
@@ -139,14 +154,20 @@ Component.prototype.template = function() {
     return "";
 };
 
-Component.frameTemplate = tmpl(
+Component.prototype.frameTemplate = tmpl(
     "<div class='control' style='width:<%= getOption(\"width\") %>;'><div>" +
-        "<%= template(obj) %>" + 
+        "<%= internalRender(obj) %>" + 
     "</div></div>"
 );
 
 Component.prototype.render = function() {
-    return Component.frameTemplate(this);
+    return this.frameTemplate(this);
+};
+
+Component.prototype.template = function() { return ""; };
+
+Component.prototype.internalRender = function() {
+    return this.template(this);
 };
 
 // To be overridden
@@ -170,7 +191,8 @@ MultiComponent.prototype.forEachChild = function(callback) {
     var children = this.getChildren();
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
-        callback(child.getId(), child);
+        child.setParent(this);
+        callback(child.getName(), child);
     }
 };
 
@@ -180,14 +202,6 @@ MultiComponent.prototype.render = function() {
         html += child.render();
     });
     return html;
-};
-
-// TODO: THIS DOESN'T WORK WITH MULTIPLE CALLINGS! 
-MultiComponent.prototype.setId = function(id) {
-    Component.prototype.setId.call(this, id);
-    /*this.forEachChild(function(childName, child) {
-        child.setId(id + "." + childName);          // Prefix it with parent id
-    });*/
 };
 
 // TODO: not efficient
@@ -208,16 +222,13 @@ inherits(Input, Component);
 exports.Input = function(options) { return new Input(options); };
 
 Input.prototype.template = tmpl(
+    "<label><%=getName() %></label>" +        // TODO: get from type
     "<input id='<%=getId()%>' " +
     "<% if (getRecord().getPropertyType(getPropertyName()).isNumber) { %>" +
         " style='text-align:right;' " +
     "<% } %>" +
     "value='<%=getRecord().get(getPropertyName())%>' />"
 );
-
-/*Input.prototype.render = function() {
-    return this.template(this);
-}*/
 
 // Input - client side methods
 

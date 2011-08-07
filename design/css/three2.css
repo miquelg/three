@@ -1,0 +1,25 @@
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial;
+    font-size: 13px;
+    margin: 0;
+    border: 0;
+    background: url(../img/texture-noise-grey.jpg);
+}
+
+.topbar {
+    background: #000000;
+    color: #ffffff;
+    display: block;
+    width: 100%;
+}
+
+.topbar .user {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px 10px;
+}
+
+.topbar .toggle {
+    padding: 10px 10px;
+}
