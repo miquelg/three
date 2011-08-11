@@ -11,14 +11,19 @@ Model = function(type) {
     this.type_ = type;
     this.recordClass_ = null;
     Model.modelsMap[type.getName()] = this;
+    console.log("ModelsMap: " + type.getName() + "-" + Model.getModelByName(type.getName()).getType().table + "/ModelsMap: ");
 };
 Model.prototype.isModel = true;
 
 Model.modelsMap = {};
 
+Model.getModelByName = function(name) {
+    return Model.modelsMap[name];
+};
+
 Model.prototype.getType = function() {
     return this.type_;
-}
+};
 
 Model.prototype.getProperties = function() {
     return this.type_.properties;
@@ -43,11 +48,12 @@ Model.prototype.getRecordClass = function() {
     // f.loadCollection
     
     f.load = function(where, store, callback) {
-        store.loadRecord(model, where, "", "", callback);        // TODO: params?
+        store.loadRecord(model, where, "", "", callback);        // TODO: params
     };
     
-    f.loadCollection = function(where, store, callback) {
-        store.loadCollection(model, where, "", "", callback);        // TODO: params?
+    f.loadCollection = function(where, store, params, offset, rowCount, callback) {
+        console.log( store);
+        store.loadCollection(model, where, "", params, offset, rowCount, callback);        // TODO: params, startRow, numRows
     };
 
     f.getModel = function() {

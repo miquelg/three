@@ -15,22 +15,24 @@ Store = function(dataSource) {
 // TODO: err
 Store.prototype.loadRecord = function(model, where, order, params, callback) {
     var ds = this.dataSource_;
-    var col = ds.retrieve(model, where, order, params, function(col) {
+    var store = this;
+    var col = ds.retrieve(model, where, order, params, 0, 1, function(col) {
         var record = col.get(0);
-        record.setStore(this);      // Set the store, since ds retrieved records are storeless
+        record.setStore(store);      // Set the store, since ds retrieved records are storeless
         if (callback) callback(record);
     });
 };
 
 // TODO: err
-Store.prototype.loadCollection = function(model, where, order, params, callback) {
+Store.prototype.loadCollection = function(model, where, order, params, offset, rowCount, callback) {
     var ds = this.dataSource_;
-    var col = ds.retrieve(model, where, order, params, function(col) {
+    var store = this;
+    var col = ds.retrieve(model, where, order, params, offset, rowCount, function(col) {
         for (var i = 0; i < col.size(); i++) {
             var record = col.get(i);
-            record.setStore(this);
+            record.setStore(store);
         }
-        col.setStore(this);      // Set the storex
+        col.setStore(store);      // Set the storex
         if (callback) callback(col);
     });
 };

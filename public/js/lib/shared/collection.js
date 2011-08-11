@@ -26,6 +26,14 @@ Collection.prototype.setStore = function(store) {
     this.store_ = store;
 };
 
+Collection.prototype.getModel = function() {
+    return this.model_;
+};
+
+Collection.prototype.setModel = function(model) {
+    this.model_ = model;
+};
+
 Collection.prototype.insert = function(record) { 
 	if (this.getIndex(record) == -1)
 		this.elements_.push(record); 

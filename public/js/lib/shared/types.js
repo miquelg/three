@@ -77,7 +77,11 @@ RecordType.prototype.getProperties = function() {
 
 RecordType.prototype.getName = function() {
     return this.name ? this.name : this.table;
-}
+};
+
+RecordType.prototype.getPk = function() {
+    return this.pk;
+};
 
 // Relation types
 

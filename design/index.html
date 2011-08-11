@@ -9,6 +9,14 @@
             <div class="toggle">Sakila</div>
             <div class="user">Usuario</div>
         </div>
+        <div class="content">
+            <div class="detail">
+               
+                <div id="detail-header">
+                
+                </div>
+            </div>  
+        </div>
         <div id="navigator" class="navigation">
             <ul>
                 <li><a href="#"><span class="num">123</span>Uno</a></li>
@@ -68,7 +76,13 @@ function generateRandomColor(mixRed, mixGreen, mixBlue) {
 var nums = document.getElementById("navigator").getElementsByTagName("span");
 for (var i = 0; i < nums.length; i++) {
     var num = nums[i];
-    num.style.backgroundColor = generateRandomColor(255, 200, 200);
+    var randomColor = generateRandomColor(192, 192, 192);
+    useRandomColor(num, randomColor);
+}
+
+function useRandomColor(num, randomColor) {
+    num.style.backgroundColor = randomColor;
+    num.parentNode.onclick = function() { document.getElementById("detail-header").style.backgroundColor = randomColor; return false; }
     // num.style.display = "none";
 }
 

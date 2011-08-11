@@ -79,7 +79,16 @@ Record.prototype.forEachProperty = function(callback) {
 
 // Load a property (only has sense if it's a relation, 
 // since basic properties are already loaded
-Record.prototype.loadProperty = function(property, preloadPaths) {
+// TODO: support "own"
+// TODO: rename to "loadPath" ???
+Record.prototype.loadProperty = function(propertyName, offset, rowCount, callback) {
+    var type = this.getPropertyType(propertyName);
+    if (type.isRelationN) {
+        var model =  Model.modelsMap[type.model];
+        model.getRecordClass().loadCollection(type.other + "=?", this.getStore(), [this.get(this.getModel().getType().getPk())], offset, rowCount, function(col) {
+            if (callback) callback(col);
+        });
+    }
 };
 
 exports.Record = Record;

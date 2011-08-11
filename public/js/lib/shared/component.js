@@ -61,6 +61,8 @@ else {
 
 (function(exports) {   // Open closure
 
+  exports.tmpl = tmpl;
+
 
 // template
 // render - generate HTML (binded?)
@@ -78,6 +80,7 @@ var Component = function(options) {
     this.options_ = options || {};                              // de-jsonify (recordfy)?
     if (options && options.name) this.setName(options.name);  // Set internally rather than externally
     this.parent_ = null;                                     // Parent (none by default)
+    this.variables_ = {};
     
 };
 inherits(Component, EventEmitter);
@@ -97,6 +100,22 @@ Component.prototype.getParent = function() {
 
 Component.prototype.setParent = function(parent) {
   this.parent_ = parent;
+};
+
+Component.prototype.setVariable = function(variableName, value) {
+    this.variables_[variableName] = value;
+};
+
+Component.prototype.getVariable = function(variableName) {
+    return this.variables_[variableName];
+};
+
+Component.prototype.setVariables = function(variables) {
+    this.variables_[variableName] = variables;
+};
+
+Component.prototype.getVariables = function() {
+    return this.variables_;
 };
 
 Component.prototype.getId = function() {
@@ -123,14 +142,17 @@ Component.prototype.getOption = function(optionName) {
     return this.options_[optionName];
 };
 
-Component.prototype.setBinding = function(record, propertyName) {   // propertyName optional if we bind to the whole record
-    this.record_ = record;
+Component.prototype.setBinding = function(recordOrCollection, propertyName) {   // propertyName optional if we bind to the whole record
+    this.recordOrCollection_ = recordOrCollection;
     this.propertyName_ = propertyName;
 };
 
 Component.prototype.getRecord = function() {
-    return this.record_;
+    return this.recordOrCollection_;
 };
+
+// Alias if we are binding to a Collection
+Component.prototype.getCollection = Component.prototype.getRecord;
 
 Component.prototype.getPropertyName = function() {
     return this.propertyName_;
@@ -161,7 +183,8 @@ Component.prototype.frameTemplate = tmpl(
 );
 
 Component.prototype.render = function() {
-    return this.frameTemplate(this);
+    return this.frameTemplate(this) +
+        "<input type='hidden' id='" + this.getId() + ".variables' value='" + JSON.stringify(this.getVariables()) + "'/>";
 };
 
 Component.prototype.template = function() { return ""; };
@@ -169,6 +192,8 @@ Component.prototype.template = function() { return ""; };
 Component.prototype.internalRender = function() {
     return this.template(this);
 };
+
+exports.Component = Component;
 
 // To be overridden
 
@@ -180,6 +205,10 @@ Component.prototype.getOptionsComponent = function() {};
 var MultiComponent = function(options, children) {
   this.children_ = children || []; 
   Component.call(this, options);
+  var this_ = this;
+  this.forEachChild(function(childName, child) {
+      child.setParent(this_);
+  });
 };
 inherits(MultiComponent, Component);
 
@@ -191,9 +220,25 @@ MultiComponent.prototype.forEachChild = function(callback) {
     var children = this.getChildren();
     for (var i = 0; i < children.length; i++) {
         var child = children[i];
-        child.setParent(this);
         callback(child.getName(), child);
     }
+};
+
+MultiComponent.prototype.forEachDescendant = function(callback) {
+    var this_ = this;
+    this.forEachChild(function(childName, child) {
+        if (callback) callback(childName, child);
+        this_.forEachDescendant(callback);
+    });
+};
+
+MultiComponent.prototype.assignVariablesFromParams = function(params) {
+    this.forEachDescendant(function(descendantName, descendant) {
+        var variablesJson = params[descendant.getId() + ".variables"];
+        if (variablesJson) {
+            descendant.setVariables(JSON.parse(variablesJson));
+        }
+    });
 };
 
 MultiComponent.prototype.render = function() {
@@ -295,6 +340,32 @@ Form.prototype.setBinding = function(record, propertyMap) {
         child.setBinding(record, propertyMap && propertyMap[childName] ? propertyMap[childName] : childName);
     });
 };
+
+// SimpleGrid
+// Input - example
+
+var SimpleGrid = function(options) {
+  Component.call(this, options);
+};
+inherits(SimpleGrid, Component);
+
+exports.SimpleGrid = function(options) { return new SimpleGrid(options); };
+
+SimpleGrid.prototype.frameTemplate = tmpl(
+    "<table>" + 
+        "<% var model = getCollection().getModel(); %>" +
+        "<% model.forEachProperty(function(name, type) { %>" +
+            "<th><%= name %></th>" +
+        "<% }); %>" +
+        "<% for (var i = 0; i < getCollection().size(); i++) { var elem = getCollection().get(i);  %>" +
+            "<tr>" +
+                "<% model.forEachProperty(function(name, type) { %>" +
+                    "<td><%= elem.get(name) %></td>" +
+                "<% }); %>" +
+            "</tr>" +
+        "<% } %>" +
+    "</table>" 
+);
 
 
 })(exports ? exports : window.components);
