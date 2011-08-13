@@ -118,9 +118,16 @@ Component.prototype.getVariables = function() {
     return this.variables_;
 };
 
+Component.prototype.getNamespace = function() {
+    var parent = this.getParent();
+    return parent ? parent.getNamespace() : "";     // By default, parent namespace
+};
+
+// TODO: there are parents that do not extend namespace: "groupbox", "tab", and others that do: "form"
+//       getParentNamespace() instead
 Component.prototype.getId = function() {
     var parent = this.getParent();
-    return parent ? parent.getId() + "." + this.getName() : this.getName();
+    return this.getNamespace() != "" ? this.getNamespace() + "." + this.getName() : this.getName();
 };
 
 Component.prototype.getOptions = function() {
@@ -341,6 +348,10 @@ Form.prototype.setBinding = function(record, propertyMap) {
     });
 };
 
+Form.prototype.getNamespace = function() {
+    return this.getParent() && this.getParent().getNamespace() != "" ? this.getParent().getNamespace() + "." + this.getName() : this.getName();
+};
+
 // SimpleGrid
 // Input - example
 
@@ -364,7 +375,9 @@ SimpleGrid.prototype.frameTemplate = tmpl(
                 "<% }); %>" +
             "</tr>" +
         "<% } %>" +
-    "</table>" 
+    "</table>" +
+    "<a href='#'>Previous</a> <%= getVariable('page') %> " +
+    " <a href='#'>Next</a>"
 );
 
 

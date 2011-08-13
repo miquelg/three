@@ -84,6 +84,17 @@ Collection.forEachRecord = function(callback) {
 	}
 };
 
+Collection.prototype.toJSON = function() {
+    var this_ = this;
+    var object = { model: this.getModel().getName() };
+    elements = [];
+    for (var i = 0; i < this.size(); i++) {
+        elements.push(this.get(i));
+    };
+    object.elements = elements;
+    return object;
+};
+
 exports.Collection = Collection;
 
 })(exports ? exports : window);

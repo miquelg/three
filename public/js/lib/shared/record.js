@@ -80,15 +80,80 @@ Record.prototype.forEachProperty = function(callback) {
 // Load a property (only has sense if it's a relation, 
 // since basic properties are already loaded
 // TODO: support "own"
-// TODO: rename to "loadPath" ???
+// TODO: rename to "loadPath" or "loadRelation" ???
 Record.prototype.loadProperty = function(propertyName, offset, rowCount, callback) {
+    var this_ = this;
     var type = this.getPropertyType(propertyName);
     if (type.isRelationN) {
         var model =  Model.modelsMap[type.model];
         model.getRecordClass().loadCollection(type.other + "=?", this.getStore(), [this.get(this.getModel().getType().getPk())], offset, rowCount, function(col) {
+            this_.set(propertyName, col);
             if (callback) callback(col);
         });
     }
+};
+
+// Writes value data to a JSON string
+// deep: also writes relations (keeps trace of written elements to cute down recursivity)
+// TODO: test!!!
+/*Record.prototype.toJSON = function(deep) {
+    var this_ = this;
+    var writtenElem = { this_: true };
+    if (deep) {
+        var json = this.toJSON(false);
+        json = json.substring(0, json.length-1);    // remove }
+        this.forEachProperty(function(name, propertyType) {
+            var first = true;
+            if (propertyType.isRelationN) {
+                var col = this_.get(name);
+                if (col) {
+                    if (!first) { json.push(", "); first = false; }
+                    json.push('"' + name + '": [ ');
+                    for (i = 0; i < col.size(); i++) {
+                        if (i > 0) json.push(", ");
+                        var elem = col.get(i);
+                        var alreadyWritten = writtenElem[elem];
+                        writtenElem[elem] = true;
+                        json.push(elem.toJSON(!alreadyWritten));
+                    }
+                    json.push(" ]");
+                }
+            }
+            // TODO: Relation1
+        });
+        // json.push(" }");
+        return json;
+    }
+    else {
+        var values = { model: this.getModel().getName() };
+        this.forEachProperty(function(name, propertyType) {
+            if (!propertyType.isRelation) {
+                values[name] = this_.get(name);
+            }
+        });
+        return JSON.stringify(values);
+    }
+};*/
+
+// TODO: use this map to avoid recursion, writting only PK columns for already written records
+Record.jsonRecurseMap = {};
+
+Record.prototype.convertToJSON = function() {
+    Record.jsonRecurseMap = {};
+    return JSON.stringify(JSON.stringify(this));
+};
+
+// Internal method: not to be called
+Record.prototype.toJSON = function() {
+    var this_ = this;
+    var values = { model: this.getModel().getName() };
+    this.forEachProperty(function(name, propertyType) {
+        if (propertyType) {
+            values[name] = this_.get(name);
+        }
+    });
+    // return JSON.stringify(values);
+    return values;
 };
 
 exports.Record = Record;

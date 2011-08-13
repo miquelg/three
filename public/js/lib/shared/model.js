@@ -11,7 +11,7 @@ Model = function(type) {
     this.type_ = type;
     this.recordClass_ = null;
     Model.modelsMap[type.getName()] = this;
-    console.log("ModelsMap: " + type.getName() + "-" + Model.getModelByName(type.getName()).getType().table + "/ModelsMap: ");
+    // console.log("ModelsMap: " + type.getName() + "-" + Model.getModelByName(type.getName()).getType().table + "/ModelsMap: ");
 };
 Model.prototype.isModel = true;
 
@@ -19,6 +19,10 @@ Model.modelsMap = {};
 
 Model.getModelByName = function(name) {
     return Model.modelsMap[name];
+};
+
+Model.prototype.getName = function() {
+    return this.type_.getName();
 };
 
 Model.prototype.getType = function() {
@@ -52,7 +56,7 @@ Model.prototype.getRecordClass = function() {
     };
     
     f.loadCollection = function(where, store, params, offset, rowCount, callback) {
-        console.log( store);
+        // console.log( store);
         store.loadCollection(model, where, "", params, offset, rowCount, callback);        // TODO: params, startRow, numRows
     };
 

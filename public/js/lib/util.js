@@ -17,3 +17,12 @@ inherits = function (ctor, superCtor) {
         }
     });
 };
+
+function submitForm()
+{
+    var forms = document.getElementsByTag("form");
+    if (forms && forms[0]) {
+        forms[0].submit();
+    }
+}
+
