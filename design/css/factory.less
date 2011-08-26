@@ -1,0 +1,139 @@
+// CSS Reset
+@import "reset.less";
+
+// Core
+@import "preboot.less";
+
+// VARIABLES
+// ---------
+
+// Layout sizes
+@headerHeight:      50px;
+@subheaderHeight:   40px;
+@subheaderBkColor:  #333;
+@sidebarWidth:      230px;
+@viewbarHeight:     25px;
+@actionbarHeight:   35px;
+@bottombarHeight:   35px;
+
+body {
+    background-color: #ccc;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
+div.header {
+    background: #000;
+    color: #fff;
+    width: 100%;
+    height: @headerHeight;
+    
+}
+
+div.sidebar {
+    background: #DDD;
+    position: absolute;
+    top: @headerHeight;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    width: @sidebarWidth;
+    overflow: hidden;
+    
+    div.tabsbar {
+        position: relative;
+        background: @subheaderBkColor;
+        height: @subheaderHeight;
+    }
+
+}
+
+div.main {
+    background: #fff;
+    overflow: auto;
+    position: absolute;
+    top: @headerHeight;
+    bottom: 0;
+    right: 0;
+    width: auto;
+    left: @sidebarWidth;
+    
+    div.tabsbar {
+        position: relative;
+        background: @subheaderBkColor;
+        height: @subheaderHeight;
+    }
+    
+    div.viewbar {
+        background: #eee;
+        height: @viewbarHeight;
+    }
+    
+    div.actionbar {
+        background: #f6f6f6;
+        height: @actionbarHeight;
+    }
+
+    div.content {
+        overflow: auto;
+        position: absolute;
+        top: @subheaderHeight + @actionbarHeight + @viewbarHeight;
+        left: 0;
+        bottom: @bottombarHeight;
+        right: 0;
+        width: auto;
+    }
+    
+    div.bottombar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #f6f6f6;
+        height: @actionbarHeight;
+    }
+}
+
+ul.tabs {
+  margin: 0 0 20px;
+  padding: 0;
+  .clearfix();
+  li {
+    display: inline;
+    a {
+      float: left;
+      width: auto;
+    }
+  }
+}
+
+// Basic Tabs
+ul.tabs {
+  position: absolute;
+  bottom: 0;
+  height: 27px;
+  right: 0;
+  width: 100%;
+  li {
+    a {
+      margin-bottom: -1px;
+      margin-right: 2px;
+      padding: 0 15px;
+      line-height: (@baseline * 2) - 1;
+      .border-radius(3px 3px 0 0);
+      &:hover {
+        background-color: @grayLighter;
+        border-bottom: 1px solid @grayLight;
+      }
+    }
+    &.active a {
+      background-color: #fff;
+      padding: 0 14px;
+      border: 1px solid #ccc;
+      border-bottom: 0;
+      color: @gray;
+    }
+  }
+}
+
+

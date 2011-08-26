@@ -9,7 +9,7 @@ if (exports) {
 // Create a record from its values
 var Record = function(values, store) {
   EventEmitter.call(this);
-  this.values_ = values || {};
+  this.values_ = values || {};  // TODO: admit relations (recursive)
   this.store_ = store;
   this.dirtyMark_ = Record.UNMODIFIED;
   // TODO: Create fake PK if not informed
@@ -93,52 +93,15 @@ Record.prototype.loadProperty = function(propertyName, offset, rowCount, callbac
     }
 };
 
+// TODO: use this map to avoid recursion, writting only PK columns for already written records
+Record.jsonRecurseMap = {};
+Record.jsonRecurseDeep = false;
+
 // Writes value data to a JSON string
 // deep: also writes relations (keeps trace of written elements to cute down recursivity)
 // TODO: test!!!
-/*Record.prototype.toJSON = function(deep) {
-    var this_ = this;
-    var writtenElem = { this_: true };
-    if (deep) {
-        var json = this.toJSON(false);
-        json = json.substring(0, json.length-1);    // remove }
-        this.forEachProperty(function(name, propertyType) {
-            var first = true;
-            if (propertyType.isRelationN) {
-                var col = this_.get(name);
-                if (col) {
-                    if (!first) { json.push(", "); first = false; }
-                    json.push('"' + name + '": [ ');
-                    for (i = 0; i < col.size(); i++) {
-                        if (i > 0) json.push(", ");
-                        var elem = col.get(i);
-                        var alreadyWritten = writtenElem[elem];
-                        writtenElem[elem] = true;
-                        json.push(elem.toJSON(!alreadyWritten));
-                    }
-                    json.push(" ]");
-                }
-            }
-            // TODO: Relation1
-        });
-        // json.push(" }");
-        return json;
-    }
-    else {
-        var values = { model: this.getModel().getName() };
-        this.forEachProperty(function(name, propertyType) {
-            if (!propertyType.isRelation) {
-                values[name] = this_.get(name);
-            }
-        });
-        return JSON.stringify(values);
-    }
-};*/
-
-// TODO: use this map to avoid recursion, writting only PK columns for already written records
-Record.jsonRecurseMap = {};
-
-Record.prototype.convertToJSON = function() {
+Record.prototype.convertToJSON = function(deep) {
+    Record.jsonRecurseDeep = deep;
     Record.jsonRecurseMap = {};
     return JSON.stringify(JSON.stringify(this));
 };
@@ -148,7 +111,7 @@ Record.prototype.toJSON = function() {
     var this_ = this;
     var values = { model: this.getModel().getName() };
     this.forEachProperty(function(name, propertyType) {
-        if (propertyType) {
+        if (propertyType && (Record.jsonRecurseDeep || propertyType.isRelation)) {
             values[name] = this_.get(name);
         }
     });

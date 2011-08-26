@@ -257,6 +257,8 @@ MultiComponent.prototype.render = function() {
 };
 
 // TODO: not efficient
+// TODO: global map for root (no parent) components
+//       serves as base for Component.getComponentFromId(...)
 MultiComponent.prototype.getChildFromName = function(name) {
     this.forEachChild(function(childName, child) {
         if (childName == name) return child;
