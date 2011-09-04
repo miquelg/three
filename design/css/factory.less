@@ -14,7 +14,7 @@
 @sidebarWidth:      230px;
 @viewbarHeight:     25px;
 @actionbarHeight:   35px;
-@bottombarHeight:   35px;
+@bottombarHeight:   25px;
 
 body {
     background-color: #ccc;
@@ -39,11 +39,28 @@ div.sidebar {
     padding: 0;
     width: @sidebarWidth;
     overflow: hidden;
-    
+    .box-shadow(inset -3px 0 6px -2px #888);
     div.tabsbar {
         position: relative;
         background: @subheaderBkColor;
         height: @subheaderHeight;
+
+        ul.tabs {
+          li {
+            a {
+              margin: 0 1px 0 2px;
+              background-color: #aaa;
+              color: #333;
+              &:hover {
+                background-color: #bbb;
+              }
+            }
+            &.active a {
+              background-color: #ddd;
+              color: #333;
+             }
+          }
+        }
     }
 
 }
@@ -90,50 +107,63 @@ div.main {
         left: 0;
         right: 0;
         background: #f6f6f6;
-        height: @actionbarHeight;
+        height: @bottombarHeight;
     }
 }
 
-ul.tabs {
-  margin: 0 0 20px;
-  padding: 0;
-  .clearfix();
-  li {
-    display: inline;
-    a {
-      float: left;
-      width: auto;
-    }
-  }
-}
-
-// Basic Tabs
 ul.tabs {
   position: absolute;
   bottom: 0;
-  height: 27px;
   right: 0;
   width: 100%;
+  margin: 0;
+  padding: 0;
   li {
+    display: inline;
     a {
-      margin-bottom: -1px;
-      margin-right: 2px;
+      display: inline;
+      margin: 0 3px 0 0;
       padding: 0 15px;
-      line-height: (@baseline * 2) - 1;
-      .border-radius(3px 3px 0 0);
+      line-height: 26px;
+      .border-radius(4px 4px 0 0);
+      background-color: #b4b4b4;
+      text-decoration: none;
+      color: #333;
+      float: left;
+      width: auto;
+      // border-bottom: 2px solid green;
       &:hover {
-        background-color: @grayLighter;
-        border-bottom: 1px solid @grayLight;
+        background-color: #ccc;
       }
     }
     &.active a {
-      background-color: #fff;
+      background-color: #ebebeb;
       padding: 0 14px;
-      border: 1px solid #ccc;
       border-bottom: 0;
-      color: @gray;
+      color: #333;
+      // border-bottom: 2px solid red;
     }
   }
+}
+
+ul.select-pane {
+    padding-top: 18px;
+    li {
+        
+        a {
+            display: block;
+            color: #666;
+            line-height: 18px;
+            padding-left: 10px;
+            padding-right: 10px;
+            text-decoration: none;
+            &:hover {
+                background-color: #666;
+                color: #fff;
+            }
+        }
+
+    }
 }
 
 
