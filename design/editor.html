@@ -1,0 +1,290 @@
+<html>
+
+<head>
+    <title>Editor prototype</title>
+    
+    <script type="text/javascript" src="js/util.js" ></script>
+    <script type="text/javascript" src="js/EventEmitter.js" ></script>
+<style>
+
+body {
+    background-color: #ddd;
+    font-family: 'Helvetica Neue', 'Lucida Grande', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    margin: 0;
+    border: 0;
+}
+
+.clear {
+    clear: both;
+}
+
+.control {
+    float: left;
+	width: 50%;		/* Defecto */
+	padding: 0;
+	border: 0;
+	margin: 0;
+	margin-top: 1px;
+	*margin-left:-0.05em;
+}
+
+.control > div {		/* No compatible IE6 */
+	width: auto;
+	margin-right: 10px;
+}
+
+.control > div > .box,  .control > div > .multiBox {
+    width: 100%;
+}
+
+.box {
+	border: 1px solid #ddd;
+	background: #fff;
+	padding-bottom: 4px;
+	padding-left: 5px;
+	padding-right: 0;
+	padding-top: 5px;
+	margin: 0;
+	margin-bottom: 5px;
+}
+
+.box:hover {
+    border: 1px solid #c8c8c8;    
+    background: #f8f8f8;
+}
+
+.box.selected {
+    border: 1px solid #c9e0ed;
+    background: #ebf3f8;
+}
+
+.multiBox {
+    border: 1px dashed navy;
+}
+
+</style>
+
+<script>
+
+// Simple JavaScript Templating
+// John Resig - http://ejohn.org/ - MIT Licensed
+(function(){
+  var cache = {};
+  
+  this.tmpl = function tmpl(str, data){
+    // Figure out if we're getting a template, or if we need to
+    // load the template - and be sure to cache the result.
+    var fn = !/\W/.test(str) ?
+      cache[str] = cache[str] ||
+        tmpl(document.getElementById(str).innerHTML) :
+      
+      // Generate a reusable function that will serve as a template
+      // generator (and which will be cached).
+      new Function("obj",
+        "var p=[],print=function(){p.push.apply(p,arguments);};" +
+        
+        // Introduce the data as local variables using with(){}
+        "with(obj){p.push('" +
+        
+        // Convert the template into pure JavaScript
+        // Single-quote issue fix from http://www.west-wind.com/weblog/posts/2008/Oct/13/Client-Templating-with-jQuery
+        str.replace(/[\r\t\n]/g, " ")
+               .replace(/'(?=[^%]*%>)/g, "\t")
+               .split("'").join("\\'")
+               .split("\t").join("'")
+               .replace(/<%=(.+?)%>/g, "',$1,'")
+               .split("<%").join("');")
+               .split("%>").join("p.push('")
+               
+      + "');}return p.join('');");
+      
+    // Provide some basic currying to the user
+    return data ? fn( data ) : fn;
+  };
+})();
+
+// Box for editor mockup
+//
+var Box = function(options) {
+    EventEmitter.call(this);
+    this.options_ = options || {}; 
+    this.parent_ = null;                                     // Parent (none by default
+    this.id_ = null;
+    
+};
+inherits(Box, EventEmitter);
+Box.prototype.isBox = true;
+
+Box.prototype.getParent = function() {
+  return this.parent_;
+};
+
+Box.prototype.setParent = function(parent) {
+  this.parent_ = parent;
+};
+
+Box.idCounter = 1;
+Box.prototype.getId = function() {
+    if (!this.id_) {
+        this.id_ = "id#" + Box.idCounter++;
+    }
+    return this.id_;
+};
+
+Box.prototype.getOptions = function() {
+    return this.options_;
+};
+
+Box.prototype.setOptions = function(options) {
+  this.options_ = options;
+};
+
+Box.prototype.setOption = function(optionName, optionValue, paint) {
+  this.options_[optionName] = optionValue;
+  if (paint) {
+      this.paint();
+  }
+};
+
+Box.prototype.getOption = function(optionName) {
+    return this.options_[optionName];
+};
+
+Box.prototype.getElement = function() {
+    return document.getElementById(this.id_);
+};
+
+Box.prototype.paint = function() {
+    // Render HTML
+    var html = this.render();
+    // Inject HTML
+    var element = this.getElement();
+    element.innerHTML = html;
+};
+
+Box.prototype.frameTemplate = tmpl(
+    "<div class='control' style='width:<%= getOption(\"width\") %>;'><div>" +
+        "<%= internalRender(obj) %>" + 
+    "</div></div>"
+);
+
+Box.prototype.render = function() {
+    return this.frameTemplate(this);
+};
+
+Box.prototype.template = tmpl(
+    "<div id='<%= getId() %>' class='box' style='height:<%= getOption(\"height\") %>;'></div>"
+);
+
+Box.prototype.internalRender = function() {
+    return this.template(this);
+};
+
+// TODO: rename (init, initUI, ...)
+//
+Box.prototype.postRender = function() {
+    var e = this.getElement();
+    this.getElement().onclick = function() {
+        if (!hasClass(e, "selected")) {
+            addClass(e, "selected");
+        }
+        else {
+            removeClass(e, "selected");
+        }
+    };
+};
+
+// MultiBox - Box composed from multiple boxes
+//
+var MultiBox = function(options, children) {
+  this.children_ = children || []; 
+  Box.call(this, options);
+  var this_ = this;
+  this.forEachChild(function(childName, child) {
+      child.setParent(this_);
+  });
+};
+inherits(MultiBox, Box);
+
+MultiBox.prototype.getChildren = function() {
+  return this.children_;
+};
+
+MultiBox.prototype.forEachChild = function(callback) {
+    var children = this.getChildren();
+    for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        callback(/*child.getName()*/child.getId(), child);
+    }
+};
+
+MultiBox.prototype.forEachDescendant = function(callback) {
+    var this_ = this;
+    this.forEachChild(function(childName, child) {
+        if (callback) callback(childName, child);
+        this_.forEachDescendant(callback);
+    });
+};
+
+MultiBox.prototype.internalRender = function() {
+    var html = "<div class='multiBox'>";
+    this.forEachChild(function(childName, child) {
+        html += child.render();
+    });
+    html += "<div class='clear'></div>";
+    html += "</div>";
+    return html;
+};
+
+MultiBox.prototype.postRender = function() {
+    this.forEachChild(function(childName, child) {
+        child.postRender();
+    });
+};
+
+// NewLine
+
+var NewLine = function(options) {
+  Box.call(this, options);
+};
+inherits(NewLine, Box);
+
+NewLine.prototype.render = function() {
+    return "<br class='clear'/>"; // Not in frame
+};
+
+NewLine.prototype.postRender = function() {};
+
+</script>
+
+</head>
+<body>
+    Hola<br/><br/><br/>
+    <div class="clear"></div>
+    
+    <div id="canvas"></div>
+
+</body>
+<script>
+
+var multiBox = new MultiBox({ width: "50%" }, [ 
+    new Box({ width: "40%", height: "50px" }),
+    new Box({ width: "60%", height: "50px" }),
+    new NewLine(),
+    new MultiBox({ width: "50%" }, [ 
+        new Box({ width: "60%", height: "110px" }),
+        new Box({ width: "40%", height: "23px" })
+    ]),
+    new MultiBox({ width: "50%" }, [ 
+        new Box({ width: "20%", height: "110px" }),
+        new Box({ width: "40%", height: "23px" })
+    ])
+]);
+
+document.getElementById("canvas").innerHTML = multiBox.render();
+multiBox.postRender();
+
+</script>
+
+</html>

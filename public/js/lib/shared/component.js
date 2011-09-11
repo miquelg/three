@@ -6,6 +6,8 @@ else {
     window.components = {};     // TODO: rename with lib name
 }
 
+// TODO: meterlo en util.js
+
 // Simple JavaScript Templating
 // John Resig - http://ejohn.org/ - MIT Licensed
 (function(){
@@ -179,10 +181,6 @@ Component.prototype.paint = function() {
     element.innerHTML = html;
 };
 
-Component.prototype.template = function() {
-    return "";
-};
-
 Component.prototype.frameTemplate = tmpl(
     "<div class='control' style='width:<%= getOption(\"width\") %>;'><div>" +
         "<%= internalRender(obj) %>" + 
@@ -248,7 +246,7 @@ MultiComponent.prototype.assignVariablesFromParams = function(params) {
     });
 };
 
-MultiComponent.prototype.render = function() {
+MultiComponent.prototype.internalRender = function() {
     var html = "";
     this.forEachChild(function(childName, child) {
         html += child.render();
@@ -365,7 +363,7 @@ inherits(SimpleGrid, Component);
 exports.SimpleGrid = function(options) { return new SimpleGrid(options); };
 
 SimpleGrid.prototype.frameTemplate = tmpl(
-    "<table>" + 
+    "<table class='grid_js' >" + 
         "<% var model = getCollection().getModel(); %>" +
         "<% model.forEachProperty(function(name, type) { %>" +
             "<th><%= name %></th>" +
