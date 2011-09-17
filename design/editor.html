@@ -20,6 +20,7 @@ body {
 }
 
 .control {
+    position: relative;     /* Para handles */
     float: left;
 	width: 50%;		/* Defecto */
 	padding: 0;
@@ -54,13 +55,78 @@ body {
     background: #f8f8f8;
 }
 
-.box.selected {
+.control.selected > div > .box {
     border: 1px solid #c9e0ed;
     background: #ebf3f8;
 }
 
+.control .resize-handle-x, .control .resize-handle-y {
+    display: none;
+}
+
+.control.selected > div > .resize-handle-x {
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -8px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: url(img/resize-handle.png) no-repeat top left;
+    cursor: ew-resize;
+    z-index: 100;
+}
+
+.control.selected > div > .resize-handle-y {
+    display: block;
+    position: absolute;
+    left: 50%;
+    margin-left: -8px;
+    bottom: -2px;
+    width: 12px;
+    height: 12px;
+    background: url(img/resize-handle.png) no-repeat top left;
+    cursor: ns-resize;
+    z-index: 100;
+}
+
 .multiBox {
     border: 1px dashed navy;
+}
+
+.control.selected > div > .multiBox {
+    border: 1px dashed #c9e0ed;
+    background: #ebf3f8;
+}
+
+.canvas {
+
+}
+
+.multi-select {
+    position: absolute;
+    background-color: hsla(0, 100%, 0%, 0.2);
+    border: 1px solid #fff;
+}
+
+.dimension-x {
+    position: absolute;
+    text-align: center;
+    font-size: 10px;
+    height: 12px;
+    border: 0;
+    border-left: 1px solid red;
+    border-right: 1px solid red;
+    border-top: 1px solid red;
+}
+
+.dimension-x span {
+    color: red;
+    background-color: #ebf3f8;
+    padding-left: 2px; padding-right: 2px;
+}
+
+.dimension-y {
 }
 
 </style>
@@ -166,6 +232,7 @@ Box.prototype.paint = function() {
 Box.prototype.frameTemplate = tmpl(
     "<div class='control' style='width:<%= getOption(\"width\") %>;'><div>" +
         "<%= internalRender(obj) %>" + 
+        "<div class='resize-handle-x'></div><div class='resize-handle-y'></div>" +
     "</div></div>"
 );
 
@@ -174,25 +241,91 @@ Box.prototype.render = function() {
 };
 
 Box.prototype.template = tmpl(
-    "<div id='<%= getId() %>' class='box' style='height:<%= getOption(\"height\") %>;'></div>"
+    "<div id='<%= getId() %>' class='box' style='height:<%= getOption(\"height\") %>;'>" +
+    "</div>"
 );
 
 Box.prototype.internalRender = function() {
     return this.template(this);
 };
 
+Box.prototype.selectUnselect = function(select) {
+    var elem = this.getElement();
+    if (elem) {
+        var control = elem.parentNode.parentNode;
+        var hasTheClass = hasClass(control, "selected");
+        if (select && !hasTheClass) {
+            addClass(control, "selected");
+        }
+        else if (!select && hasTheClass) {
+            removeClass(control, "selected");
+        }
+    }
+};
+
 // TODO: rename (init, initUI, ...)
 //
 Box.prototype.postRender = function() {
-    var e = this.getElement();
-    this.getElement().onclick = function() {
-        if (!hasClass(e, "selected")) {
-            addClass(e, "selected");
+    var elem = this.getElement();
+    var control = elem.parentNode.parentNode;
+    var this_ = this;
+    /*control.onclick = function(e) {
+        canvas.unselectAll();
+        this_.selectUnselect(true);
+        e.stopPropagation();
+        return false;
+    };*/
+    var rxs = getElementsByClassName(control, "resize-handle-x");
+    var rx = rxs[rxs.length-1];
+    rx.onmousedown = function(e) {
+        var e = e || window.event;
+        var initialX = e.clientX;
+        var initialWidth =  control.clientWidth;
+        var dimensionX = getElementsByClassName(document, "dimension-x")[0];
+        dimensionX.style.display = "";
+        dimensionX.style.left = getOffset(control).left;
+        dimensionX.style.top = getOffset(control).top + 5;
+        dimensionX.style.width = elem.clientWidth;
+        console.log(e);
+        document.onmousemove = function(e) {
+            var event = e || window.event;
+            control.style.width = initialWidth + (e.clientX - initialX) + "px";
+            dimensionX.style.width = elem.clientWidth;
+            dimensionX.innerHTML = "<span>" + control.style.width  + "</span";
+            console.log(e);
         }
-        else {
-            removeClass(e, "selected");
+        document.onmouseup = function(e) {
+            console.log(e);
+            var event = e || window.event;
+            document.onmousemoveup = null;
+            document.onmousemove = null;
+            dimensionX.style.display = "none";
+            event.stopPropagation();
         }
-    };
+        e.stopPropagation();
+        return false;
+    }
+    var ryx = getElementsByClassName(control, "resize-handle-y");
+    var ry = ryx[ryx.length-1];
+    ry.onmousedown = function(e) {
+        var e = e || window.event;
+        var dragging = true;
+        var initialY = e.clientY;
+        var initialHeight =  elem.clientHeight;
+        document.onmousemove = function(e) {
+            var event = e || window.event;
+            elem.style.height = initialHeight + (e.clientY - initialY) + "px";
+        }
+        document.onmouseup = function(e) {
+            console.log(e);
+            var event = e || window.event;
+            document.onmouseup = null;
+            document.onmousemove = null;
+            event.stopPropagation();
+        }
+        e.stopPropagation();
+        return false;
+    }
 };
 
 // MultiBox - Box composed from multiple boxes
@@ -206,6 +339,7 @@ var MultiBox = function(options, children) {
   });
 };
 inherits(MultiBox, Box);
+MultiBox.prototype.isMultiBox = true;
 
 MultiBox.prototype.getChildren = function() {
   return this.children_;
@@ -223,12 +357,14 @@ MultiBox.prototype.forEachDescendant = function(callback) {
     var this_ = this;
     this.forEachChild(function(childName, child) {
         if (callback) callback(childName, child);
-        this_.forEachDescendant(callback);
+        if (child.isMultiBox) {
+            child.forEachDescendant(callback);
+        }
     });
 };
 
 MultiBox.prototype.internalRender = function() {
-    var html = "<div class='multiBox'>";
+    var html = "<div id='" + this.getId() + "' class='multiBox'>";
     this.forEachChild(function(childName, child) {
         html += child.render();
     });
@@ -238,6 +374,7 @@ MultiBox.prototype.internalRender = function() {
 };
 
 MultiBox.prototype.postRender = function() {
+    Box.prototype.postRender.call(this);
     this.forEachChild(function(childName, child) {
         child.postRender();
     });
@@ -251,19 +388,102 @@ var NewLine = function(options) {
 inherits(NewLine, Box);
 
 NewLine.prototype.render = function() {
-    return "<br class='clear'/>"; // Not in frame
+    return "<br id='<%= getId() %>' class='clear'/>"; // Not in frame
 };
 
 NewLine.prototype.postRender = function() {};
+
+// Canvas - The whole stuff
+//
+var Canvas = function(options, children) {
+  MultiBox.call(this, options, children);
+};
+inherits(Canvas, MultiBox);
+
+Canvas.prototype.render = function() {
+    var html = "<div id='" + this.getId() + "' style='width:" + this.getOption("width") + ";height:" + this.getOption("height") + ";' class='canvas'>";
+    this.forEachChild(function(childName, child) {
+        html += child.render();
+    });
+    html += "<div class='clear'></div>";
+    html += "<div class='multi-select'></div>";
+    html += "</div>";
+    return html;
+};
+
+Canvas.prototype.unselectAll = function() {
+    this.forEachDescendant(function(childName, child) {
+        child.selectUnselect(false);
+    });
+};
+
+Canvas.prototype.postRender = function() {
+    
+    var elem = this.getElement();
+    var multiSelect = getElementsByClassName(elem, "multi-select")[0];
+    var this_ = this;
+    elem.onmousedown = function(e) {
+        var e = e || window.event;
+        var initialX = e.clientX;
+        var initialY = e.clientY;
+        multiSelect.style.left = initialX + "px";
+        multiSelect.style.top = initialY + "px";
+        multiSelect.style.width = "1px";
+        multiSelect.style.height = "1px";
+        multiSelect.style.display = "";
+
+        document.onmousemove = function(e) {
+            var event = e || window.event;
+            // console.log(e);
+            multiSelect.style.left = (e.clientX > initialX ? initialX : e.clientX) + "px";
+            multiSelect.style.width = Math.abs(e.clientX - initialX) + "px";
+            multiSelect.style.top = (e.clientY > initialY ? initialY : e.clientY) + "px";
+            multiSelect.style.height = Math.abs(e.clientY - initialY) + "px";
+        }
+        document.onmouseup = function(e) {
+            var event = e || window.event;
+            document.onmouseup = null;
+            document.onmousemove = null;
+            multiSelect.style.display = "none";
+            var finalX = (e.clientX > initialX ? e.clientX : initialX);
+            initialX = (e.clientX > initialX ? initialX : e.clientX)
+            var finalY = (e.clientY > initialY ? e.clientY : initialY);
+            initialY = (e.clientY > initialY ? initialY : e.clientY)
+            this_.forEachDescendant(function(childName, child) {
+                var childElem = child.getElement();
+                if (childElem) {
+                    var childInitialX = getOffset(childElem).left;
+                    var childFinalX = childInitialX + childElem.clientWidth -1;
+                    var childInitialY = getOffset(childElem).top;
+                    var childFinalY = childInitialY + childElem.clientHeight -1;
+                    console.log(initialX, childInitialX, childFinalX );
+                    child.selectUnselect(
+                        !(childFinalX < initialX || finalX < childInitialX) &&
+                        !(childFinalY < initialY || finalY < childInitialY) );
+                }
+                // child.selectUnselect(true);
+            });;
+            
+            event.stopPropagation();
+        }
+        
+        e.stopPropagation();
+        return false;
+    };
+    
+    this.forEachChild(function(childName, child) {
+        child.postRender();
+    });
+};
 
 </script>
 
 </head>
 <body>
-    Hola<br/><br/><br/>
-    <div class="clear"></div>
-    
     <div id="canvas"></div>
+    
+
+    <div class="dimension-x" style="width:300px"><span>323 px</span></div>
 
 </body>
 <script>
@@ -282,8 +502,10 @@ var multiBox = new MultiBox({ width: "50%" }, [
     ])
 ]);
 
-document.getElementById("canvas").innerHTML = multiBox.render();
-multiBox.postRender();
+var canvas = new Canvas({ width: "1024px", height: "800px" }, [multiBox]);
+
+document.getElementById("canvas").innerHTML = canvas.render();
+canvas.postRender();
 
 </script>
 
