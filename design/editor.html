@@ -112,21 +112,50 @@ body {
 .dimension-x {
     position: absolute;
     text-align: center;
+    background: url(img/dimension-background.png) repeat-x left center;
     font-size: 10px;
-    height: 12px;
+    height: 9px;
     border: 0;
     border-left: 1px solid red;
     border-right: 1px solid red;
-    border-top: 1px solid red;
+
 }
 
 .dimension-x span {
+    position: relative;
+    top: -2px;
     color: red;
     background-color: #ebf3f8;
     padding-left: 2px; padding-right: 2px;
 }
 
 .dimension-y {
+    position: absolute;
+    text-align: center;
+    background: url(img/dimension-background.png) repeat-y center top;
+    font-size: 10px;
+    width: 9px;
+    border: 0;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+
+}
+
+.dimension-y span {
+    position: absolute;
+    width: 40px;
+    margin-left: -20px;
+    top: 50%;
+    margin-top: -7px;
+    color: red;
+    background-color: #ebf3f8;
+}
+
+.drop-caret {
+    position: absolute;
+    background-color: #555;
+    width: 0;
+    height: 0;
 }
 
 </style>
@@ -275,6 +304,7 @@ Box.prototype.postRender = function() {
         e.stopPropagation();
         return false;
     };*/
+    elem.isBox = true;  // kludge!!!
     var rxs = getElementsByClassName(control, "resize-handle-x");
     var rx = rxs[rxs.length-1];
     rx.onmousedown = function(e) {
@@ -286,12 +316,12 @@ Box.prototype.postRender = function() {
         dimensionX.style.left = getOffset(control).left;
         dimensionX.style.top = getOffset(control).top + 5;
         dimensionX.style.width = elem.clientWidth;
-        console.log(e);
+        // console.log(e);
         document.onmousemove = function(e) {
             var event = e || window.event;
             control.style.width = initialWidth + (e.clientX - initialX) + "px";
             dimensionX.style.width = elem.clientWidth;
-            dimensionX.innerHTML = "<span>" + control.style.width  + "</span";
+            dimensionX.innerHTML = "<span>" + control.style.width  + "</span>";
             console.log(e);
         }
         document.onmouseup = function(e) {
@@ -312,19 +342,52 @@ Box.prototype.postRender = function() {
         var dragging = true;
         var initialY = e.clientY;
         var initialHeight =  elem.clientHeight;
+        var dimensionY = getElementsByClassName(document, "dimension-y")[0];
+        dimensionY.style.display = "";
+        dimensionY.style.left = getOffset(control).left + 5;
+        dimensionY.style.top = getOffset(control).top;
+        dimensionY.style.height = elem.clientHeight;
         document.onmousemove = function(e) {
             var event = e || window.event;
             elem.style.height = initialHeight + (e.clientY - initialY) + "px";
+            dimensionY.style.height = elem.clientHeight;
+            dimensionY.innerHTML = "<span>" + elem.style.height + "</span>";
         }
         document.onmouseup = function(e) {
             console.log(e);
             var event = e || window.event;
             document.onmouseup = null;
             document.onmousemove = null;
+            dimensionY.style.display = "none";
             event.stopPropagation();
         }
         e.stopPropagation();
         return false;
+    }
+};
+
+Box.prototype.getLimits = function() {
+    var elem = this.getElement();
+    var offset = getOffset(elem);
+    return { 
+        x1: offset.left, 
+        y1: offset.top, 
+        x2: offset.left + elem.clientWidth, 
+        y2: offset.top + elem.clientHeight 
+    };
+};
+
+Box.prototype.determineDropPosition = function(x, y) {
+    var limits = this.getLimits();
+    var distX1 = Math.abs(x - limits.x1), distX2 = Math.abs(x - limits.x2), distX = Math.min(distX1, distX2);
+    var distY1 = Math.abs(y - limits.y1), distY2 = Math.abs(y - limits.y2), distY = Math.min(distY1, distY2);
+    if (distX < distY) { 
+        if (distX1 < distX2) return { left: limits.x1 };
+        else return { right: limits.x2 };
+    }
+    else { 
+        if (distY1 < distY2) return { top: limits.y1 };
+        else return { bottom: limits.y2 };
     }
 };
 
@@ -354,7 +417,6 @@ MultiBox.prototype.forEachChild = function(callback) {
 };
 
 MultiBox.prototype.forEachDescendant = function(callback) {
-    var this_ = this;
     this.forEachChild(function(childName, child) {
         if (callback) callback(childName, child);
         if (child.isMultiBox) {
@@ -378,6 +440,28 @@ MultiBox.prototype.postRender = function() {
     this.forEachChild(function(childName, child) {
         child.postRender();
     });
+};
+
+MultiBox.prototype.descendantFromId = function(id) {
+    var descendant = null;
+    this.forEachDescendant(function(childName, child) {
+        if (child.getId() === id) {
+            descendant = child;
+        }
+    });
+    return descendant;
+};
+
+// TODO: better algorithm?
+//
+MultiBox.prototype.descendantFromElement = function(elem) {
+    while (elem) {
+        if (elem.isBox) {
+            return this.descendantFromId(elem.id);
+        }
+        elem = elem.parentNode;
+    }
+    return null;
 };
 
 // NewLine
@@ -407,6 +491,9 @@ Canvas.prototype.render = function() {
     });
     html += "<div class='clear'></div>";
     html += "<div class='multi-select'></div>";
+    html += "<div class='dimension-x'></div>";
+    html += "<div class='dimension-y'></div>";
+    html += "<div class='drop-caret'></div>";
     html += "</div>";
     return html;
 };
@@ -422,6 +509,14 @@ Canvas.prototype.postRender = function() {
     var elem = this.getElement();
     var multiSelect = getElementsByClassName(elem, "multi-select")[0];
     var this_ = this;
+    elem.onmousemove = function(e) {
+        var event = e || window.event;
+        var target = event.target || event.srcElement;
+        var descendant = this_.descendantFromElement(target);
+        if (descendant) {
+            this_.renderDropCaret(descendant, e.clientX, e.clientY);
+        }
+    }
     elem.onmousedown = function(e) {
         var e = e || window.event;
         var initialX = e.clientX;
@@ -476,14 +571,43 @@ Canvas.prototype.postRender = function() {
     });
 };
 
+Canvas.prototype.renderDropCaret = function(descendant, x, y) {
+    var dropCaret = getElementsByClassName(this.getElement(), "drop-caret")[0];
+    console.log(dropCaret);
+    var dropPosition = descendant.determineDropPosition(x, y);
+    var limits = descendant.getLimits();
+    console.log(dropPosition, limits);
+    if (dropPosition.left || dropPosition.right) {
+        dropCaret.style.left = (dropPosition.left || dropPosition.right) + "px";
+        dropCaret.style.top = limits.y1 + "px";
+        dropCaret.style.height = limits.y2 - limits.y1 + "px";
+        dropCaret.style.width = "4px";
+        console.log(dropCaret.left, dropCaret.top, dropCaret.height, dropCaret.width);
+    }
+    else {
+        var maxY2 = limits.y2;
+        /*
+        var parent = descendant.getParent();
+        if (parent) {
+            parent.forEachChild(function(childName, child) {
+                var y2 = child.getLimits().y2;
+                if (y2 > maxY2) maxY2 = y2;
+            });
+            var limits = parent.getLimits();
+        }
+        */
+        dropCaret.style.top = (dropPosition.top ? limits.y1 : maxY2) + "px";
+        dropCaret.style.left = limits.x1 + "px";
+        dropCaret.style.width = limits.x2 - limits.x1 + "px";
+        dropCaret.style.height = "4px";
+    }  
+};
+
 </script>
 
 </head>
 <body>
     <div id="canvas"></div>
-    
-
-    <div class="dimension-x" style="width:300px"><span>323 px</span></div>
 
 </body>
 <script>
