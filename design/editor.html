@@ -99,6 +99,14 @@ body {
     background: #ebf3f8;
 }
 
+.new-line {
+    clear: both;
+    background-color: red;
+    height: 2px;
+    width: 2px;
+    line-height: 2px;
+}
+
 .canvas {
 
 }
@@ -320,6 +328,8 @@ Box.prototype.postRender = function() {
         document.onmousemove = function(e) {
             var event = e || window.event;
             control.style.width = initialWidth + (e.clientX - initialX) + "px";
+            dimensionX.style.left = getOffset(control).left;
+            dimensionX.style.top = getOffset(control).top + 5;   
             dimensionX.style.width = elem.clientWidth;
             dimensionX.innerHTML = "<span>" + control.style.width  + "</span>";
             console.log(e);
@@ -372,23 +382,27 @@ Box.prototype.getLimits = function() {
     return { 
         x1: offset.left, 
         y1: offset.top, 
-        x2: offset.left + elem.clientWidth, 
-        y2: offset.top + elem.clientHeight 
+        x2: offset.left + (elem ? elem.clientWidth : 0), 
+        y2: offset.top + (elem ? elem.clientHeight : 0)
     };
 };
 
 Box.prototype.determineDropPosition = function(x, y) {
+    var dropPosition = { target: this };
+    
     var limits = this.getLimits();
     var distX1 = Math.abs(x - limits.x1), distX2 = Math.abs(x - limits.x2), distX = Math.min(distX1, distX2);
     var distY1 = Math.abs(y - limits.y1), distY2 = Math.abs(y - limits.y2), distY = Math.min(distY1, distY2);
     if (distX < distY) { 
-        if (distX1 < distX2) return { left: limits.x1 };
-        else return { right: limits.x2 };
+        if (distX1 < distX2) dropPosition.left = limits.x1;
+        else dropPosition.right = limits.x2;
     }
     else { 
-        if (distY1 < distY2) return { top: limits.y1 };
-        else return { bottom: limits.y2 };
+        if (distY1 < distY2) dropPosition.top = limits.y1;
+        else dropPosition.bottom = limits.y2;
     }
+    
+    return dropPosition;
 };
 
 // MultiBox - Box composed from multiple boxes
@@ -452,6 +466,90 @@ MultiBox.prototype.descendantFromId = function(id) {
     return descendant;
 };
 
+MultiBox.prototype.indexOfChild = function(child) {
+    for (var i = 0; i < this.getChildren().length; i++) {
+        if (this.getChildren()[i] == child) return i;
+    }
+};
+
+MultiBox.prototype.nextSibling = function(child) {
+    var index = this.indexOfChild(child);
+    return (index+1 == this.getChildren().length ? null : this.getChildren()[index+1]);
+};
+
+MultiBox.prototype.previousSibling = function(child) {
+    var index = this.indexOfChild(child);
+    return (index-1 < 0 ? null : this.getChildren()[index-1]);
+};
+
+MultiBox.prototype.removeChild = function(child) {
+    var index = this.indexOfChild(child);
+    
+    console.log("Before:", index);
+    for (var i = 0; i < this.getChildren().length; i++) {
+        console.log(this.getChildren()[i].getId());
+    }
+    
+    // Remove from children
+    this.getChildren().splice(index, 1);
+    child.setParent(null);
+    
+    console.log("After:");
+    for (var i = 0; i < this.getChildren().length; i++) {
+        console.log(this.getChildren()[i].getId());
+    }
+    
+    // Remove from DOM
+    var control = child.getElement().parentNode.parentNode;     // TODO: support not-framed controls
+    control.parentNode.removeChild(control);
+};
+
+MultiBox.prototype.insert = function(newChild, referenceChild, after) {
+    
+    var newControl;
+    if (!newChild.getParent()) {    // Does not have parent, assume not rendered yet
+        console.log(newChild.render());
+        var dummyDiv = document.createElement("div");
+        dummyDiv.innerHTML = newChild.render();
+        newControl = dummyDiv.firstChild;
+        // TODO: must destroy dummyDiv ??
+        // newControl = document.createElement(newChild.render());
+    }
+    else {
+        newControl = newChild.getElement().parentNode.parentNode;               // TODO: support not-framed controls
+        // Remove from last parent
+        newChild.getParent().removeChild(newChild);
+    }
+
+    // Attach to new parent
+    //
+    // Insert into children
+    var index = this.indexOfChild(referenceChild);
+    this.getChildren().splice(after ? index+1 : index, 0, newChild);
+    newChild.setParent(this);
+    
+    // Insert into DOM
+    // TODO: support not-framed controls
+    var referenceControl;
+    if (referenceChild.isNewLine) {
+        referenceControl = referenceChild.getElement();
+    }
+    else {
+        referenceControl = referenceChild.getElement().parentNode.parentNode;
+    }
+    if (after) {
+        // If next sibling doesn't exist, it would still work, because the referenceNode.nextSibling will return “null”, 
+        // and js will just append to last child of parent node.
+        referenceControl.parentNode.insertBefore(newControl, referenceControl.nextSibling);
+    }
+    else {
+        referenceControl.parentNode.insertBefore(newControl, referenceControl);
+    }
+    
+    return newChild;        // Return newly inserted element
+    
+};
+
 // TODO: better algorithm?
 //
 MultiBox.prototype.descendantFromElement = function(elem) {
@@ -470,9 +568,10 @@ var NewLine = function(options) {
   Box.call(this, options);
 };
 inherits(NewLine, Box);
+NewLine.prototype.isNewLine = true;
 
 NewLine.prototype.render = function() {
-    return "<br id='<%= getId() %>' class='clear'/>"; // Not in frame
+    return "<br id='" + this.getId() + "' class='new-line' />"; // Not in frame
 };
 
 NewLine.prototype.postRender = function() {};
@@ -481,6 +580,7 @@ NewLine.prototype.postRender = function() {};
 //
 var Canvas = function(options, children) {
   MultiBox.call(this, options, children);
+  this.selected_ = [];
 };
 inherits(Canvas, MultiBox);
 
@@ -509,6 +609,7 @@ Canvas.prototype.postRender = function() {
     var elem = this.getElement();
     var multiSelect = getElementsByClassName(elem, "multi-select")[0];
     var this_ = this;
+    /*
     elem.onmousemove = function(e) {
         var event = e || window.event;
         var target = event.target || event.srcElement;
@@ -517,49 +618,117 @@ Canvas.prototype.postRender = function() {
             this_.renderDropCaret(descendant, e.clientX, e.clientY);
         }
     }
+    */
     elem.onmousedown = function(e) {
+        
         var e = e || window.event;
         var initialX = e.clientX;
         var initialY = e.clientY;
-        multiSelect.style.left = initialX + "px";
-        multiSelect.style.top = initialY + "px";
-        multiSelect.style.width = "1px";
-        multiSelect.style.height = "1px";
-        multiSelect.style.display = "";
-
-        document.onmousemove = function(e) {
-            var event = e || window.event;
-            // console.log(e);
-            multiSelect.style.left = (e.clientX > initialX ? initialX : e.clientX) + "px";
-            multiSelect.style.width = Math.abs(e.clientX - initialX) + "px";
-            multiSelect.style.top = (e.clientY > initialY ? initialY : e.clientY) + "px";
-            multiSelect.style.height = Math.abs(e.clientY - initialY) + "px";
+        
+        var selected = this_.selectedFromRectangle(initialX, initialY, initialX, initialY);
+        var uniqueSelected = (selected.length > 0 ? selected[0] : null);
+        for (var i = 0; i < this_.selected_.length; i++) {
+            if (uniqueSelected == this_.selected_[i]) break;
         }
-        document.onmouseup = function(e) {
-            var event = e || window.event;
-            document.onmouseup = null;
-            document.onmousemove = null;
-            multiSelect.style.display = "none";
-            var finalX = (e.clientX > initialX ? e.clientX : initialX);
-            initialX = (e.clientX > initialX ? initialX : e.clientX)
-            var finalY = (e.clientY > initialY ? e.clientY : initialY);
-            initialY = (e.clientY > initialY ? initialY : e.clientY)
-            this_.forEachDescendant(function(childName, child) {
-                var childElem = child.getElement();
-                if (childElem) {
-                    var childInitialX = getOffset(childElem).left;
-                    var childFinalX = childInitialX + childElem.clientWidth -1;
-                    var childInitialY = getOffset(childElem).top;
-                    var childFinalY = childInitialY + childElem.clientHeight -1;
-                    console.log(initialX, childInitialX, childFinalX );
-                    child.selectUnselect(
-                        !(childFinalX < initialX || finalX < childInitialX) &&
-                        !(childFinalY < initialY || finalY < childInitialY) );
+        if (i < this_.selected_.length) {   // Move mode
+        
+           var dropPosition = null;
+           
+           document.onmousemove = function(e) {
+                var event = e || window.event;
+                var target = event.target || event.srcElement;
+                var descendant = this_.descendantFromElement(target);
+                if (descendant) {
+                    dropPosition = this_.renderDropCaret(descendant, e.clientX, e.clientY);
                 }
-                // child.selectUnselect(true);
-            });;
-            
-            event.stopPropagation();
+            }
+            document.onmouseup = function(e) {
+                var event = e || window.event;
+                document.onmouseup = null;
+                document.onmousemove = null;
+                
+                var dropCaret = getElementsByClassName(this_.getElement(), "drop-caret")[0];
+                dropCaret.style.display = "none";
+                
+                // Do the move
+                if (dropPosition) {
+                    var target = dropPosition.target;
+                    if (target != uniqueSelected) {
+                        
+                        var targetParent = target.getParent();
+                        if (dropPosition.top) {
+                            var previousSibling = targetParent.previousSibling(target);
+                            while (previousSibling && !previousSibling.isNewLine) {
+                                target = previousSibling;
+                                previousSibling = targetParent.previousSibling(target);
+                            }
+                            if (!previousSibling) {
+                                target = targetParent.insert(new NewLine(), target, false);
+                            }
+                            else {
+                                target = previousSibling;
+                            }
+                        }
+                        else if (dropPosition.bottom) {
+                            var nextSibling = targetParent.nextSibling(target);
+                            while (nextSibling && !nextSibling.isNewLine) {
+                                target = nextSibling;
+                                nextSibling = targetParent.nextSibling(target);
+                            }
+                            if (!nextSibling) {
+                                target = targetParent.insert(new NewLine(), target, true);
+                            }
+                            else {
+                                target = nextSibling;
+                            }
+                        }
+    
+                        // uniqueSelected.getParent().removeChild(uniqueSelected);
+                        targetParent.insert(uniqueSelected, target, dropPosition.right || dropPosition.bottom);
+                    }
+                }
+            }
+        }
+        else {  // Selection mode
+        
+            multiSelect.style.left = initialX + "px";
+            multiSelect.style.top = initialY + "px";
+            multiSelect.style.width = "1px";
+            multiSelect.style.height = "1px";
+            multiSelect.style.display = "";
+    
+            document.onmousemove = function(e) {
+                var event = e || window.event;
+                // console.log(e);
+                multiSelect.style.left = (e.clientX > initialX ? initialX : e.clientX) + "px";
+                multiSelect.style.width = Math.abs(e.clientX - initialX) + "px";
+                multiSelect.style.top = (e.clientY > initialY ? initialY : e.clientY) + "px";
+                multiSelect.style.height = Math.abs(e.clientY - initialY) + "px";
+            }
+            document.onmouseup = function(e) {
+                var event = e || window.event;
+                document.onmouseup = null;
+                document.onmousemove = null;
+                multiSelect.style.display = "none";
+                var finalX = (e.clientX > initialX ? e.clientX : initialX);
+                initialX = (e.clientX > initialX ? initialX : e.clientX)
+                var finalY = (e.clientY > initialY ? e.clientY : initialY);
+                initialY = (e.clientY > initialY ? initialY : e.clientY)
+                
+                this_.selected_ = this_.selectedFromRectangle(initialX, initialY, finalX, finalY);
+                
+                // Unselect all
+                this_.forEachDescendant(function(childName, child) {
+                   child.selectUnselect(false);
+                 });
+                
+                // Select
+                for (i = 0; i < this_.selected_.length; i++) {
+                    this_.selected_[i].selectUnselect(true);
+                }
+    
+                event.stopPropagation();
+            }
         }
         
         e.stopPropagation();
@@ -573,7 +742,9 @@ Canvas.prototype.postRender = function() {
 
 Canvas.prototype.renderDropCaret = function(descendant, x, y) {
     var dropCaret = getElementsByClassName(this.getElement(), "drop-caret")[0];
+    dropCaret.style.display = "";
     console.log(dropCaret);
+    
     var dropPosition = descendant.determineDropPosition(x, y);
     var limits = descendant.getLimits();
     console.log(dropPosition, limits);
@@ -586,21 +757,54 @@ Canvas.prototype.renderDropCaret = function(descendant, x, y) {
     }
     else {
         var maxY2 = limits.y2;
-        /*
         var parent = descendant.getParent();
-        if (parent) {
+        var newLineFound = false;
+        if (parent && (dropPosition.top || dropPosition.bottom)) {
             parent.forEachChild(function(childName, child) {
+                if (child.isNewLine) newLineFound = true;
                 var y2 = child.getLimits().y2;
-                if (y2 > maxY2) maxY2 = y2;
+                if (y2 > maxY2 && !newLineFound) maxY2 = y2;
             });
             var limits = parent.getLimits();
         }
-        */
         dropCaret.style.top = (dropPosition.top ? limits.y1 : maxY2) + "px";
         dropCaret.style.left = limits.x1 + "px";
         dropCaret.style.width = limits.x2 - limits.x1 + "px";
         dropCaret.style.height = "4px";
-    }  
+    } 
+    return dropPosition;
+};
+
+// TODO: support more modes apart from "intersect"
+// 
+Canvas.prototype.selectedFromRectangle = function(initialX, initialY, finalX, finalY) {
+    var selected = [];
+    
+    this.forEachDescendant(function(childName, child) {
+        var childElem = child.getElement();
+        if (childElem) {
+            var childInitialX = getOffset(childElem).left;
+            var childFinalX = childInitialX + childElem.clientWidth -1;
+            var childInitialY = getOffset(childElem).top;
+            var childFinalY = childInitialY + childElem.clientHeight -1;
+            var intersects = !(childFinalX < initialX || finalX < childInitialX) &&
+                             !(childFinalY < initialY || finalY < childInitialY);
+            if (intersects) {
+                selected.push(child);
+            }
+        }
+    });
+    
+    // Cut off parents
+    var onlyLeafs = [];
+    for (var i = 0; i < selected.length; i++) {
+        for (var j = 0; j < selected.length; j++) {
+            if (selected[j].getParent() == selected[i]) break;
+        }
+        if (j == selected.length) onlyLeafs.push(selected[i]);
+    }
+
+    return onlyLeafs;
 };
 
 </script>
