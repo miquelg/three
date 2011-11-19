@@ -202,8 +202,7 @@ exports.Component = Component;
 
 // To be overridden
 
-Component.prototype.getOptionsModel = function() {};
-Component.prototype.getOptionsComponent = function() {};
+Component.prototype.getOptionsModel = function() { };
 
 // MultiComponent - Component composed from multiple components
 

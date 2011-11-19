@@ -1,0 +1,383 @@
+body {
+	// margin: 8px;
+	padding: 0;
+	background: #f2f2f2;
+	font-family: Tahoma;
+	font-size: 11px;
+}
+
+input { /* display: block; */
+	height: 13px;
+	background: #FFFFFF;
+	margin: 0px;
+	padding-left: 4px;
+	padding-top: 1px;
+	margin: 1px;
+	color: #000000;
+	text-decoration: none;
+}
+
+select,textarea {
+	font-family: Tahoma;
+	font-size: 11px;
+	color: #000000;
+	text-decoration: none;
+	border: 1px solid #5294BA;
+}
+
+.clear {
+	clear: both;
+}
+
+.clearLeft {
+	clear: left;
+}
+
+.clearRight {
+	clear: right;
+}
+
+
+/* Tabset */
+
+.tabset {
+
+	margin: 0;
+	padding: 0;
+	height: 22px;
+	background: url(../img/tab.gif) repeat-x top left;
+}
+
+.tabset li {
+	display: block;
+	float: left;
+	background: url(../img/tabL.gif) no-repeat top left;
+}
+
+.tabset li.sel {
+	background-image: url(../img/tabLSel_FFFFFF.gif);
+}
+
+.tabset li a {
+	display: block;
+	margin-left: 2px;
+	background: transparent url(../img/tabBg.gif) repeat-x top left;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.tabset li.sel a {
+	background-image: url(../img/tabBgSel_FFFFFF.gif);
+}
+
+.tabset li a span {
+	display: block;
+	height: 17px;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 5px;
+	background: transparent url(../img/tabR.gif) no-repeat top right;
+	text-decoration: none;
+	color: #6c8c37;
+	cursor: pointer;
+}
+
+.tabset li.sel a span {
+	background-image: url(../img/tabRSel_FFFFFF.gif);
+	color: #f47b2a;
+	font-weight: bold;
+}
+
+.tabbody {
+	clear: left;
+	padding: 10px;
+	background-color: #f2f2f2;
+	border-top: 0px;
+	border-left: 1px solid #868686;
+	border-right: 1px solid #868686;
+	border-bottom: 1px solid #868686;
+}
+
+/* Grid */
+
+.grid_js {
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+	width: 100%;
+}
+
+.grid_js th {
+	background-color: #EEEEEE;
+	font-weight: bold;
+	border-bottom: 1px solid #CCCCCC;
+	border-top: 1px solid #CCCCCC;
+	height: 20px;
+	padding-left: 3px;
+	padding-right: 3px;
+	text-align: left;
+}
+
+.grid_js td {
+	border-bottom: 1px solid #EAE9E1;
+	border-collapse: collapse;
+	height: 15px;
+	line-height: 15px;
+	padding: 3px;
+	text-align: left;
+	vertical-align: middle;
+}
+
+.grid_js tr {
+	background-color: #FFFFFF;
+}
+
+.grid_js tr:hover {		/* No va en IE6 */
+	background-color: #e1f9ff;
+}
+
+.grid_js .icono {
+	width: 15px;
+	cursor: pointer;
+}
+
+.grid_js .marca {
+	padding-left: 0;
+	padding-right: 0;	
+	width: 20px;
+}
+
+/* Dialogo */
+
+.dialogo {
+	background-color: #f7f9fb;
+}
+
+.dialogo .contenido {
+	padding-bottom: 0;
+}
+
+.dialogo #botonera { 
+	border-bottom: 1px solid #CCCCCC;
+	background-color: #f7f7f7;
+}
+
+/* Layout */
+
+.control {
+	float: left;
+    position: relative;
+	width: 50%;		/* Defecto */
+	padding: 0;
+	border: 0;
+	margin: 0;
+	margin-top: 1px;
+	*margin-left:-0.05em;
+}
+
+.control > div {		/* No compatible IE6 */
+	width: auto;
+	margin-right: 10px;
+}
+
+.control > div > input, .control > div > select, .control > div > .groupbox, .control > div > textarea {
+	width: 100%;
+}
+
+.control.auto {
+	width: auto;
+}
+
+.control.auto input, .control.auto select, .control.auto .groupbox, .control.auto textarea {
+	width: auto;
+}
+
+.control.auto > div {
+	margin-right: 1px;
+}
+
+.control label {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	display: block;
+	padding-left: 2px;
+	margin: 0;
+	color: #6c8c37;
+}
+
+.check {
+	border: 0;
+	background: none;
+	margin-left: 1px;
+	margin-right: 1px;
+	margin-top: 3px;
+	margin-bottom: 1px;
+}
+
+.etiqHoriz label {
+	display: inline;
+}
+
+
+.groupbox {
+	/*border: 1px dotted #b0b0b0;*/
+	border: 1px solid #d0d0d0;
+	background: #f2f2f2;
+	padding-bottom: 4px;
+	padding-left: 5px;
+	padding-right: 0;
+	padding-top: 5px;
+	margin: 0;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.groupbox .leyenda {
+	float: left;
+	background-color: #f2f2f2;
+	color: #f47b2a;
+	padding-left: 3px;
+	padding-right: 3px;
+	/*font-weight: bold;*/
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	margin-top: -13px;
+	margin-bottom: 1px;
+	min-width: 0;		/* Activa hasLayout en IE7 */
+}
+
+.groupbox .leyenda {
+	clear: left;
+}
+
+/*button.boton {
+	margin-top: 8px;
+}
+
+button.boton span {
+	vertical-align: 2px;
+	padding-left: 1px;
+}*/
+
+.boton {
+	width: auto;
+	height: 22px;
+	overflow: visible;	/* Fix para tamaño botones IE */ 
+	margin: 2px;
+	margin-left: 0;
+	margin-right: 4px;
+	margin-top: 3px;
+	padding: 1px;
+	padding-left: 5px;
+	padding-right: 5px;
+	background: #F7F9FB url(../img/fondo_boton.gif) repeat-x scroll;
+	color: #f47b2a;
+	font-weight: bold;
+	
+	border: 1px solid #f47b2a;
+	background: #F7F9FB url(../img/fondo_boton.gif) repeat-x scroll;
+	font-family: Tahoma;
+	font-size: 11px;
+	font-weight: normal;
+	text-align: center;
+	cursor: pointer;
+}
+
+.boton img {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	vertical-align: -3px;
+	margin-right: 3px;
+}
+
+/* TODO: poner delante .dp */
+br {
+	clear: left;
+}
+
+textarea {
+	height: 50px;
+}
+
+
+.p10 { width: 10%; } 
+.p20 { width: 20%; }
+.p30 { width: 30%; }
+.p40 { width: 40%; }
+.p50 { width: 50%; }
+.p60 { width: 60%; }
+.p70 { width: 70%; }
+.p80 { width: 80%; }
+.p90 { width: 90%; }
+.p100 { width: 100%; }
+
+/* Prueba: quitar */
+
+.link {
+	text-decoration: underline;
+	color: #6040ff;
+	cursor: pointer;
+}
+
+/* Dark UI */
+
+.dark-ui {
+   background: #383f44;
+}
+
+.dark-ui .control > div {
+    position: relative;
+    // padding-left: 50px;
+    padding-bottom: 3px;
+}
+
+.dark-ui label {
+    position: absolute;
+    left: -15px;
+    text-align: right;
+    height: 22px;
+    line-height: 22px;
+    width: auto;
+    // background: url(../img/dark-input-bg-left.png) no-repeat top right;
+    margin: 0; border: 0; padding: 0;
+    padding-right: 10px;
+    padding-left: 5px;
+	color: #88939d;
+    text-shadow: 0px -1px 0px #4d565c;
+}
+
+.dark-ui input {
+    width: 100%;
+    height: 22px;
+    background: url(../img/dark-input-bg.png) no-repeat top left;   // right = rounded border
+    color: #ffffff;
+	margin: 0; border: 0; padding: 0;
+    padding-left: 3px;
+}
+
+.dark-ui .check {
+    background: none;
+    width: auto;
+}
+
+.dark-ui .groupbox {
+    background: transparent;
+    border: 1px solid #808080;
+}
+
+.dark-ui .groupbox .leyenda {
+   background: #383f44;
+}
+
+.dark-ui .Tabset_div {
+    text-align: center;
+}
+
+.dark-ui .tabset {
+    display: inline-block;
+    text-align: left;
+    margin: 0 auto;
+    width: auto;
+}
