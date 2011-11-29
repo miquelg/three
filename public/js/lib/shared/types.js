@@ -105,5 +105,10 @@ inherits(RelationN, Relation);
 RelationN.prototype.isRelationN = true;
 exports.RelationN = function(options) { return new RelationN(options); };
 
+RelationN.prototype.getModel = function() {
+    if (this.model.isModel) return this.model;
+    else return Model.modelsMap[this.model];       // If not a Model, assume a model name
+};
+
 
 })(exports ? exports : window.types );

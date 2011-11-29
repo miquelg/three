@@ -11,7 +11,7 @@ Collection = function(model, valuesArray, store) {
     this.store_ = store;
 	// Add values
     var recordClass = model.getRecordClass();
-	for (var i = 0; i < valuesArray; i++) {
+	for (var i = 0; i < valuesArray.length; i++) {
 		var record = new recordClass(valuesArray[i], store);
 		this.insert(record);
 	}
@@ -27,7 +27,8 @@ Collection.prototype.setStore = function(store) {
 };
 
 Collection.prototype.getModel = function() {
-    return this.model_;
+    if (this.model_.isModel) return this.model_;
+    else return Model.modelsMap[this.model_];       // If not a Model, assume a model name
 };
 
 Collection.prototype.setModel = function(model) {

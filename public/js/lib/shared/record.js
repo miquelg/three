@@ -9,9 +9,29 @@ if (exports) {
 // Create a record from its values
 var Record = function(values, store) {
   EventEmitter.call(this);
-  this.values_ = values || {};  // TODO: admit relations (recursive)
+  
   this.store_ = store;
   this.dirtyMark_ = Record.UNMODIFIED;
+
+  // admit relations (recursive)
+  this.values_ = {};
+  for (var key in values) {
+    var value = values[key];
+    var t = this.getPropertyType(key);
+    if (t) {
+        if (t.isRelationN) {
+            value = new Collection(t.getModel(), value, store);
+        }
+        else if (t.isRelation1) {
+            value = new t.getModel().getRecordClass()(value, store);
+        }
+        this.set(key, value);       // Proper set       
+    }
+    else {
+      this.values_[key] = value;    // Admit non–property key/values
+    }
+  }
+  
   // TODO: Create fake PK if not informed
   if (store) store.register(this);
 };
@@ -60,8 +80,8 @@ Record.prototype.set = function(propertyName, value) {
 	var t = this.getPropertyType(propertyName);
 	if (t && typeof(value) == 'string') value = t.fromString(value);
 	
-	// Sets the value
-	this.values_[propertyName] = value;
+    // Sets the value
+    this.values_[propertyName] = value;
 	
 	// Notify change
     var this_ = this;

@@ -42,8 +42,8 @@ Model.prototype.getRecordClass = function() {
 	// else define the class
     var model = this;
 	var f = function(values) {
+        this.model_ = model;
         Record.call(this, values); 
-		this.model_ = model;
 	};
 	inherits(f, Record);
     
@@ -68,11 +68,23 @@ Model.prototype.getRecordClass = function() {
 	return f;
 };
 
+// Shorcut for new Model(t.Record({})).getRecordClass();
+Model.create = function(options) {
+    return new Model(t.Record(options)).getRecordClass();
+};
+
 Model.prototype.forEachProperty = function(callback) {
     var properties = this.getProperties();
-	for (var name in properties) {
+    var first, last;
+    for (var name in properties) {
+        if (properties.hasOwnProperty(name)) {
+          if (!first) first = name;
+          last = name;
+        }
+    }
+	for (name in properties) {
 	    if (properties.hasOwnProperty(name)) {
-			callback(name, properties[name]);
+			callback(name, properties[name], name === first, name === last);
 		}
 	}
 };
