@@ -13,6 +13,12 @@ input { /* display: block; */
 	padding-left: 4px;
 	padding-top: 1px;
 	margin: 1px;
+	border-top: 1px solid #dcdcdc;
+	border-left: 1px solid #dcdcdc;
+	border-bottom: 1px solid #f0f0f0;
+	border-right: 1px solid #f0f0f0;
+	font-family: Tahoma;
+	font-size: 11px;
 	color: #000000;
 	text-decoration: none;
 }
@@ -40,7 +46,7 @@ select,textarea {
 
 /* Tabset */
 
-.tabset {
+.Tabset_js {
 
 	margin: 0;
 	padding: 0;
@@ -48,17 +54,17 @@ select,textarea {
 	background: url(../img/tab.gif) repeat-x top left;
 }
 
-.tabset li {
+.Tabset_js li {
 	display: block;
 	float: left;
 	background: url(../img/tabL.gif) no-repeat top left;
 }
 
-.tabset li.sel {
+.Tabset_js li.sel {
 	background-image: url(../img/tabLSel_FFFFFF.gif);
 }
 
-.tabset li a {
+.Tabset_js li a {
 	display: block;
 	margin-left: 2px;
 	background: transparent url(../img/tabBg.gif) repeat-x top left;
@@ -66,11 +72,11 @@ select,textarea {
 	cursor: pointer;
 }
 
-.tabset li.sel a {
+.Tabset_js li.sel a {
 	background-image: url(../img/tabBgSel_FFFFFF.gif);
 }
 
-.tabset li a span {
+.Tabset_js li a span {
 	display: block;
 	height: 17px;
 	padding-left: 15px;
@@ -82,13 +88,13 @@ select,textarea {
 	cursor: pointer;
 }
 
-.tabset li.sel a span {
+.Tabset_js li.sel a span {
 	background-image: url(../img/tabRSel_FFFFFF.gif);
 	color: #f47b2a;
 	font-weight: bold;
 }
 
-.tabbody {
+.Tabbody_js {
 	clear: left;
 	padding: 10px;
 	background-color: #f2f2f2;
@@ -165,7 +171,6 @@ select,textarea {
 
 .control {
 	float: left;
-    position: relative;
 	width: 50%;		/* Defecto */
 	padding: 0;
 	border: 0;
@@ -375,7 +380,7 @@ textarea {
     text-align: center;
 }
 
-.dark-ui .tabset {
+.dark-ui .Tabset_js {
     display: inline-block;
     text-align: left;
     margin: 0 auto;

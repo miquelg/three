@@ -8,8 +8,9 @@
 	border: 0;
 	margin: 0;
 	// margin-top: 1px;
-    margin-bottom: 1px;
+    padding-bottom: 1px;
 	*margin-left:-0.05em;
+    
 }
 
 .control > div {		/* No compatible IE6 */
@@ -99,6 +100,7 @@ input.text, textarea { /* display: block; */
 	// padding-top: 1px;
     margin: 0;
 	color: @text-color;
+    cursor: default;
 }
 
 /* select: native? */
@@ -399,6 +401,119 @@ button.boton span {
 	vertical-align: -3px;
 	margin-right: 3px;
 }
+
+/* Editor */
+
+/*.control.selected > div {
+    // border: 1px solid #c9e0ed;
+    background: #ebf3f8;
+}*/
+
+.control .resize-handle-x, .control .resize-handle-y {
+    display: none;
+}
+
+.control.selected > div > .resize-handle-x {
+    display: block;
+    position: absolute;
+    top: 50%;
+    // margin-top: -8px;
+    margin-top: -5px;
+    // right: -2px;
+    right: -6px;
+    width: 12px;
+    height: 12px;
+    background: url(../img/resize-handle.png) no-repeat top left;
+    cursor: ew-resize;
+    z-index: 100;
+}
+
+.control.selected > div > .resize-handle-y {
+    display: block;
+    position: absolute;
+    left: 50%;
+    margin-left: -8px;
+    bottom: -8px;
+    width: 12px;
+    height: 12px;
+    background: url(../img/resize-handle.png) no-repeat top left;
+    cursor: ns-resize;
+    z-index: 100;
+}
+
+.control.selected > div > .selection-mark {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    left: -3px;
+    top: -1px;
+    background: #a1b9df;
+    opacity: .3;
+    // border: 2px solid transparent;
+    border: 2px dotted #3b4350;
+    // border: 2px transparent;
+    border-radius: 5px;         // TODO: IE!
+    z-index: 50;
+}
+
+.multi-select {
+    position: absolute;
+    background-color: hsla(0, 100%, 0%, 0.2);
+    border: 1px solid #fff;
+}
+
+.dimension-x {
+    position: absolute;
+    text-align: center;
+    background: url(../img/dimension-background.png) repeat-x left center;
+    font-size: 10px;
+    height: 9px;
+    border: 0;
+    border-left: 1px solid red;
+    border-right: 1px solid red;
+
+}
+
+.dimension-x span {
+    position: relative;
+    top: -2px;
+    color: red;
+    background-color: #ebf3f8;
+    padding-left: 2px; padding-right: 2px;
+}
+
+.dimension-y {
+    position: absolute;
+    text-align: center;
+    background: url(../img/dimension-background.png) repeat-y center top;
+    font-size: 10px;
+    width: 9px;
+    border: 0;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+
+}
+
+.dimension-y span {
+    position: absolute;
+    width: 40px;
+    margin-left: -20px;
+    top: 50%;
+    margin-top: -7px;
+    color: red;
+    background-color: #ebf3f8;
+}
+
+.drop-caret {
+    position: absolute;
+    background-color: #555;
+    width: 0;
+    height: 0;
+    margin-left: -3px;
+}
+
 
 /* TODO: poner delante .dp */
 br {

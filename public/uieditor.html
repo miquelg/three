@@ -1,11 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>UI Kit</title>
+
+    <title>UI Editor</title>
     <link href="css/factory.less" rel="stylesheet/less" type="text/css">
-    <link href="css/three.less" rel="stylesheet/less" type="text/css">
-    <script src="js/util.js" type="text/javascript"></script>
+    <!-- link href="css/three.less" rel="stylesheet/less" type="text/css" -->
+    <script>
+        function generateRandomColor(mixRed, mixGreen, mixBlue) {
+            
+            var red =  Math.random() * 256;
+            var green =  Math.random() * 256;
+            var blue =  Math.random() * 256;
+            
+            mixRed = mixRed || 255;
+            mixGreen = mixGreen || 255;
+            mixBlue = mixBlue || 255;
+            
+            red = Math.floor((red + mixRed) / 2);
+            green = Math.floor((green + mixGreen) / 2);
+            blue = Math.floor((blue + mixBlue) / 2);
+        
+            return "#" + red.toString(16) + green.toString(16) + blue.toString(16);
+        }
+    </script>
+    <link href="css/forms.less" rel="stylesheet/less" type="text/css">
+    <!-- script src="js/util.js" type="text/javascript"></script -->
     <script src="js/less-1.1.3.min.js" type="text/javascript"></script>
+    
+    <script type="text/javascript" src="js/lib/util.js" ></script>
+    <script type="text/javascript" src="js/lib/EventEmitter.js" ></script>
+    <script type="text/javascript" src="js/lib/json.js" ></script>
+    
+    <script type="text/javascript" src="js/lib/shared/types.js" ></script>
+    <script type="text/javascript" src="js/lib/shared/record.js" ></script>
+    <script type="text/javascript" src="js/lib/shared/collection.js" ></script>
+    <script type="text/javascript" src="js/lib/shared/model.js" ></script>
+    <script type="text/javascript" src="js/lib/shared/component.js" ></script>
+
 </head>
 <body>
         <div class="header">
@@ -28,14 +59,28 @@
             <div class="actionbar">
                 
             </div>
+            
+                
             <div class="content" style="padding:10px;" >
             
+                <div id="form" ></div>
+                <div class="clear"></div>
+                
                 <div class='control' style='width:30%;' ><div>
                     <label>Textbox</label>
-                    <input id='' value='Pepe' />
+                    <input class="text" id='' value='Pepe' />
                 </div></div>
                 
+                <div class='control auto' ><div> 
+                    <button onclick="alert(1);" ><span>Aceptar</span></button>
+                </div></div>
+
+                <div class='control auto' ><div> 
+                    <button onclick="alert(1);" ><span>Cancelar</span></button>
+                </div></div>
+
                 <br/>
+            
                 
                 <div class='control' style='width:30%;' ><div>
                     <label>Textarea</label>
@@ -67,32 +112,38 @@
                 <div class="clear"></div>
                 
                 <div class='control' style='width:50%;' ><div>
-                <table class="grid_js">
-                    <th>Columna 1</th><th>Columna 2</th><th>Columna 3</th><th>Columna 4</th><th>Columna 5</th>
-                    <tr>
-                        <td>Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td>Dato 5</td>
+                <table class="grid">
+                
+                    <th class="first" >Columna 1</th><th>Columna 2</th><th>Columna 3</th><th>Columna 4</th><th class="last" >Columna 5</th>
+                    
+                    <tr class="first odd" >
+                        <td class="first" >Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td class="last" >Dato 5</td>
                     </tr>
-                    <tr>
-                        <td>Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td>Dato 5</td>
+                    <tr class="even" >
+                        <td class="first" >Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td class="last" >Dato 5</td>
                     </tr>
-                    <tr>
-                        <td>Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td>Dato 5</td>
+                    <tr class="odd" >
+                        <td class="first" >Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td class="last" >Dato 5</td>
                     </tr>
-                    <tr>
-                        <td>Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td>Dato 5</td>
+                    <tr class="even" >
+                        <td class="first" >Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td class="last" >Dato 5</td>
                     </tr>
-                    <tr>
-                        <td>Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td>Dato 5</td>
+                    <tr class="last odd" >
+                        <td class="first" >Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td class="last" >Dato 5</td>
                     </tr>
                 
                 </table>
                 </div></div>
                 
+                
                 <div class="clear"></div>
                 
-                <div id="dark-ui" class="dark-ui">
+                <br/>
+                <br/>
+
+        <div id="dark-ui" class="dark-ui">
                 
-    	<div class="control p100"><div><div class="groupbox"><span class="leyenda">Titular</span><div class="clear"></div>
+    	<div class="control p100"><div><div class="groupbox"><span class="legend">Titular</span><div class="clear"></div>
 		
 			<div class="control p40"><div><label>N.I.F.</label><input type="text" value="40984057N" /></div></div>
 			<div class="control p60"><div><label>Nombre</label><input type="text" value="PEREZ*ARANDA,SERGIO" /></div></div><br/>
@@ -110,7 +161,7 @@
 		
 		<div class="control p100"><div><label>Empresa</label><select><option>Empresa 1</option><option>Empresa 2</option></select></div></div><br/>
 
-		<div class="control p20"><div><div class="groupbox"><span class="leyenda">Tipo entrada</span><div class="clear"></div>
+		<div class="control p20"><div><div class="groupbox"><span class="legend">Tipo entrada</span><div class="clear"></div>
 
 			<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Normal</label></div></div>
 			<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Ley de dependencia</label></div></div>
@@ -118,7 +169,7 @@
 		<div class="clear"></div>
 		</div></div></div>
 
-		<div class="control p20"><div><div class="groupbox"><span class="leyenda">Zona</span><div class="clear"></div>
+		<div class="control p20"><div><div class="groupbox"><span class="legend">Zona</span><div class="clear"></div>
 
 			<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Zona 1</label></div></div>
 			<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Zona 2</label></div></div>
@@ -127,7 +178,7 @@
 		<div class="clear"></div>
 		</div></div></div>
 
-		<div class="control p20"><div><div class="groupbox"><span class="leyenda">Fechas</span><div class="clear"></div>
+		<div class="control p20"><div><div class="groupbox"><span class="legend">Fechas</span><div class="clear"></div>
 
 			<div class="control p100"><div><label>Solicitud</label><input type="text" value="10/10/2010" /></div></div>
 			<div class="control p100"><div><label>Resolucion</label><input type="text" value="10/10/2010" /></div></div><br/>
@@ -135,7 +186,7 @@
 		<div class="clear"></div>
 		</div></div></div>
 
-		<div class="control p20"><div><div class="groupbox"><span class="leyenda">Fechas servicio</span><div class="clear"></div>
+		<div class="control p20"><div><div class="groupbox"><span class="legend">Fechas servicio</span><div class="clear"></div>
 
 			<div class="control p100"><div><label>Inicio</label><input type="text" value="10/10/2010" /></div></div>
 			<div class="control p100"><div><label>Fin</label><input type="text" value="10/10/2010" /></div></div><br/>
@@ -143,7 +194,7 @@
 		<div class="clear"></div>
 		</div></div></div>
 
-		<div class="control p20"><div><div class="groupbox"><span class="leyenda">Resolución</span><div class="clear"></div>
+		<div class="control p20"><div><div class="groupbox"><span class="legend">Resolución</span><div class="clear"></div>
 
 			<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Concesión</label></div></div>
 			<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Denegación</label></div></div>
@@ -158,30 +209,30 @@
 		<br/>
 
         <div class="Tabset_div">
-        <ul id="pestanya_ayuda_domicilio" class="Tabset_js">  
-		    <li class="sel" ><a pestanya="Unidad familiar" ><span>Unidad familiar</span></a></li>  
+        <ul id="pestanya_ayuda_domicilio" class="tabset">  
+		    <li class="sel first" ><a pestanya="Unidad familiar" ><span>Unidad familiar</span></a></li>  
 		    <li><a pestanya="Hábitat" ><span>Hábitat</span></a></li>  
 		    <li><a pestanya="Comisiones" ><span>Comisiones</span></a></li>  
 		    <li><a pestanya="Servicios" ><span>Servicios</span></a></li>  
 		    <li><a pestanya="Suspensiones" ><span>Suspensiones</span></a></li>  
 		    <li><a pestanya="Situación administrativa" ><span>Situación administrativa</span></a></li>  
-		    <li><a pestanya="Datos económicos" ><span>Datos económicos</span></a></li>  
+		    <li class="last" ><a pestanya="Datos económicos" ><span>Datos económicos</span></a></li>  
 		</ul>
         </div>
 		
-		<div id="Unidad familiar" class="Tabbody_js" >
+		<div id="Unidad familiar" class="tabbody" >
 		
             <div class="Tabset_div">
-			<ul id="pestanya_unidad_familiar" class="Tabset_js">  
-		    	<li class="sel" ><a pestanya="Datos de usuarios" ><span>Datos de usuarios</span></a></li>  
-		    	<li><a pestanya="Persona contacto" ><span>Persona contacto</span></a></li>  
-		    	<li><a pestanya="Datos socio-sanitarios" ><span>Datos socio-sanitarios</span></a></li>  
+			<ul id="pestanya_unidad_familiar" class="tabset">  
+		    	<li class="first"><a pestanya="Datos de usuarios" ><span>Datos de usuarios</span></a></li>  
+		    	<li class="sel" ><a pestanya="Persona contacto" ><span>Persona contacto</span></a></li>  
+		    	<li class="last" ><a pestanya="Datos socio-sanitarios" ><span>Datos socio-sanitarios</span></a></li>  
 		    </ul>
             </div>
 		
-			<div id="Datos de usuarios" class="Tabbody_js" >
+			<div id="Datos de usuarios" class="tabbody" >
 			
-				<div class="control p20"><div><div class="groupbox"><span class="leyenda">Ámbito de actuación</span><div class="clear"></div>
+				<div class="control p20"><div><div class="groupbox"><span class="legend">Ámbito de actuación</span><div class="clear"></div>
 		
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Familia / menores</label></div></div>
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Personas mayores</label></div></div>
@@ -206,9 +257,9 @@
 			<div class="clear"></div>
 			</div>
 
-			<div id="Persona contacto" class="Tabbody_js" style="display:none;"  >
+			<div id="Persona contacto" class="tabbody" style="display:none;"  >
 
-				<div class="control p100"><div><div class="groupbox"><span class="leyenda">Persona de contacto</span><div class="clear"></div>
+				<div class="control p100"><div><div class="groupbox"><span class="legend">Persona de contacto</span><div class="clear"></div>
 				
 					<div class="control p100"><div><label>Nombre</label><input type="text" value="PEREZ*ARANDA,SERGIO" /></div></div><br/>
 					
@@ -232,9 +283,9 @@
 			<div class="clear"></div>
 			</div>
 
-			<div id="Datos socio-sanitarios" class="Tabbody_js" style="display:none;"  >
+			<div id="Datos socio-sanitarios" class="tabbody" style="display:none;"  >
 
-				<div class="control p100"><div><div class="groupbox"><span class="leyenda">Persona de contacto</span><div class="clear"></div>
+				<div class="control p100"><div><div class="groupbox"><span class="legend">Persona de contacto</span><div class="clear"></div>
 				
 					<div class="control p100"><div><label>Centro de salud</label><input type="text" value="xxx" /></div></div><br/>
 					
@@ -248,7 +299,7 @@
 					
 					<div class="control p50"><div><label>Fecha informe / enfermedades diagnosticadas</label><textarea></textarea></div></div>
 
-					<div class="control p50"><div><div class="groupbox"><span class="leyenda">Otros recursos sociales que disfruta</span><div class="clear"></div>
+					<div class="control p50"><div><div class="groupbox"><span class="legend">Otros recursos sociales que disfruta</span><div class="clear"></div>
 			
 						<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Teleasistencia</label></div></div>
 						<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Actividades de ocio y libre</label></div></div>
@@ -268,16 +319,16 @@
 
 		</div>
 
-		<div id="Hábitat" class="Tabbody_js" style="display:none;" >
+		<div id="Hábitat" class="tabbody" style="display:none;" >
 
-			<ul id="pestanya_habitat" class="Tabset_js">  
+			<ul id="pestanya_habitat" class="tabset">  
 		    	<li class="sel" ><a pestanya="Vivienda" ><span>Vivienda</span></a></li>  
 		    	<li><a pestanya="Equipamientos / condiciones" ><span>Equipamientos / condiciones</span></a></li>  
 		    </ul>
 
-			<div id="Vivienda" class="Tabbody_js" >
+			<div id="Vivienda" class="tabbody" >
 
-				<div class="control p20"><div><div class="groupbox"><span class="leyenda">Régimen vivienda</span><div class="clear"></div>
+				<div class="control p20"><div><div class="groupbox"><span class="legend">Régimen vivienda</span><div class="clear"></div>
 		
 					<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Cedida, facilitada</label></div></div>
 					<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Alquilada</label></div></div>
@@ -290,9 +341,9 @@
 				<div class="clear"></div>
 				</div></div></div>
 	
-				<div class="control p80"><div><div class="groupbox"><span class="leyenda">Datos vivienda</span><div class="clear"></div>
+				<div class="control p80"><div><div class="groupbox"><span class="legend">Datos vivienda</span><div class="clear"></div>
 		
-					<div class="control p50"><div><div class="groupbox"><span class="leyenda">Tipo vivienda</span><div class="clear"></div>
+					<div class="control p50"><div><div class="groupbox"><span class="legend">Tipo vivienda</span><div class="clear"></div>
 		
 						<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Piso / apartamento</label></div></div>
 						<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Vivienda unifamiliar</label></div></div>
@@ -304,7 +355,7 @@
 					<div class="clear"></div>
 					</div></div></div>
 	
-					<div class="control p50"><div><div class="groupbox"><span class="leyenda">Otros datos</span><div class="clear"></div>
+					<div class="control p50"><div><div class="groupbox"><span class="legend">Otros datos</span><div class="clear"></div>
 	
 						<div class="control p30"><div><label>Superficie (m2)</label><input type="text" value="50" /></div></div><br/>
 						<div class="control p30"><div><label>Nº dormitorios</label><input type="text" value="2" /></div></div><br/>
@@ -318,9 +369,9 @@
 			<div class="clear"></div>
 			</div>
 
-			<div id="Equipamientos / condiciones" class="Tabbody_js" style="display:none;"  >
+			<div id="Equipamientos / condiciones" class="tabbody" style="display:none;"  >
 
-				<div class="control p30"><div><div class="groupbox"><span class="leyenda">Equipamientos del hogar</span><div class="clear"></div>
+				<div class="control p30"><div><div class="groupbox"><span class="legend">Equipamientos del hogar</span><div class="clear"></div>
 	
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Agua corriente</label></div></div>
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Agua caliente</label></div></div>
@@ -331,7 +382,7 @@
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Microondas</label></div></div>
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Teléfono</label></div></div>
 					
-					<div class="control p50"><div><div class="groupbox"><span class="leyenda">Gas</span><div class="clear"></div>
+					<div class="control p50"><div><div class="groupbox"><span class="legend">Gas</span><div class="clear"></div>
 						
 						<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Butano</label></div></div>
 						<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Ciudad</label></div></div>
@@ -339,7 +390,7 @@
 					<div class="clear"></div>
 					</div></div></div>
 
-					<div class="control p50"><div><div class="groupbox"><span class="leyenda">Calefacción</span><div class="clear"></div>
+					<div class="control p50"><div><div class="groupbox"><span class="legend">Calefacción</span><div class="clear"></div>
 						
 						<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Central</label></div></div>
 						<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Individual</label></div></div>
@@ -351,7 +402,7 @@
 				<div class="clear"></div>
 				</div></div></div>
 
-				<div class="control p30"><div><div class="groupbox"><span class="leyenda">Condiciones de habitabilidad</span><div class="clear"></div>
+				<div class="control p30"><div><div class="groupbox"><span class="legend">Condiciones de habitabilidad</span><div class="clear"></div>
 	
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Barreras arquitectónicas (acceso)</label></div></div>
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Barreras arquitectónicas (vivienda)</label></div></div>
@@ -365,7 +416,7 @@
 				<div class="clear"></div>
 				</div></div></div>
 
-				<div class="control p40"><div><div class="groupbox"><span class="leyenda">Datos del entorno</span><div class="clear"></div>
+				<div class="control p40"><div><div class="groupbox"><span class="legend">Datos del entorno</span><div class="clear"></div>
 	
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Centro de salud próximo</label></div></div>
 					<div class="etiqHoriz"><div><input class="check" type="checkbox" /><label>Hospital próximo</label></div></div>
@@ -388,30 +439,30 @@
 		<div class="clear"></div>
 		</div>
 
-		<div id="Comisiones" class="Tabbody_js" style="display:none;" >
+		<div id="Comisiones" class="tabbody" style="display:none;" >
 		
 		#Grid comisiones#
 
 		<div class="clear"></div>
 		</div>
 
-		<div id="Servicios" class="Tabbody_js" style="display:none;" >
+		<div id="Servicios" class="tabbody" style="display:none;" >
 		
 		#Grid servicios#
 
 		<div class="clear"></div>
 		</div>
 
-		<div id="Suspensiones" class="Tabbody_js" style="display:none;" >
+		<div id="Suspensiones" class="tabbody" style="display:none;" >
 		
 		#Grid suspensiones#
 
 		<div class="clear"></div>
 		</div>
 
-		<div id="Situación administrativa" class="Tabbody_js" style="display:none;" >
+		<div id="Situación administrativa" class="tabbody" style="display:none;" >
 		
-			<div class="control p60"><div><div class="groupbox"><span class="leyenda">Procedencia</span><div class="clear"></div>
+			<div class="control p60"><div><div class="groupbox"><span class="legend">Procedencia</span><div class="clear"></div>
 
 				<div class="control p100"><div><label>Centro procedencia</label><select><option>Centro 1</option><option>Centro 2</option></select></div></div><br/>
 
@@ -421,7 +472,7 @@
 			<div class="clear"></div>
 			</div></div></div>
 
-			<div class="control p40"><div><div class="groupbox"><span class="leyenda">Propuesta UTS</span><div class="clear"></div>
+			<div class="control p40"><div><div class="groupbox"><span class="legend">Propuesta UTS</span><div class="clear"></div>
 
 				<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Concesión</label></div></div>
 				<div class="etiqHoriz"><div><input class="check" type="radio" /><label>Denegación</label></div></div>
@@ -432,7 +483,7 @@
 			
 			<br/>
 			
-			<div class="control p60"><div><div class="groupbox"><span class="leyenda">Situaciones administrativas</span><div class="clear"></div>
+			<div class="control p60"><div><div class="groupbox"><span class="legend">Situaciones administrativas</span><div class="clear"></div>
 			
 				#Grid situaciones administrativas#
 				
@@ -442,18 +493,18 @@
 		<div class="clear"></div>
 		</div>
 
-		<div id="Datos económicos" class="Tabbody_js" style="display:none;" >
+		<div id="Datos económicos" class="tabbody" style="display:none;" >
 
-			<ul id="pestanya_datos_economicos" class="Tabset_js">  
+			<ul id="pestanya_datos_economicos" class="tabset">  
 		    	<li class="sel" ><a pestanya="Datos generales" ><span>Datos generales</span></a></li>  
 		    	<li><a pestanya="Domiciliación" ><span>Domiciliación</span></a></li>  
 		    </ul>
 
-			<div id="Datos generales" class="Tabbody_js" >
+			<div id="Datos generales" class="tabbody" >
 
 				<div class="control p70"><div><div class="groupbox">
 	
-					<div class="control p50"><div><div class="groupbox"><span class="leyenda">Datos de regularización</span><div class="clear"></div>
+					<div class="control p50"><div><div class="groupbox"><span class="legend">Datos de regularización</span><div class="clear"></div>
 		
 						<div class="control auto"><div><label>Importe total a regularizar</label><input type="text" value="0" /></div></div><br>
 						<div class="control auto"><div><label>Importe regularizado</label><input type="text" value="3" /></div></div><br/>
@@ -462,7 +513,7 @@
 					<div class="clear"></div>
 					</div></div></div>
 		
-					<div class="control p50"><div><div class="groupbox"><span class="leyenda">Bonificación / exención</span><div class="clear"></div>
+					<div class="control p50"><div><div class="groupbox"><span class="legend">Bonificación / exención</span><div class="clear"></div>
 		
 						<div class="control auto"><div><label>Importe máximo</label><input type="text" value="0" /></div></div><br>
 						<div class="control auto"><div><label>Precio público / hora</label><input type="text" value="5" /></div></div><br/>
@@ -473,7 +524,7 @@
 					
 					<br/>
 	
-					<div class="control p100"><div><div class="groupbox"><span class="leyenda">Ingresos</span><div class="clear"></div>
+					<div class="control p100"><div><div class="groupbox"><span class="legend">Ingresos</span><div class="clear"></div>
 					
 					#Grid ingresos#
 	
@@ -483,7 +534,7 @@
 				<div class="clear"></div>
 				</div></div></div>
 	
-				<div class="control p30"><div><div class="groupbox"><span class="leyenda">Datos facturación</span><div class="clear"></div>
+				<div class="control p30"><div><div class="groupbox"><span class="legend">Datos facturación</span><div class="clear"></div>
 	
 					<div class="control p100"><div><label>Coeficiente cálculo</label><input type="text" value="0" /></div></div><br>
 					
@@ -516,9 +567,9 @@
 			<div class="clear"></div>
 			</div>
 
-			<div id="Domiciliación" class="Tabbody_js" style="display:none;" >
+			<div id="Domiciliación" class="tabbody" style="display:none;" >
 
-				<div class="control p100"><div><div class="groupbox"><span class="leyenda">Titular</span><div class="clear"></div>
+				<div class="control p100"><div><div class="groupbox"><span class="legend">Titular</span><div class="clear"></div>
 				
 					<div class="control p100"><div><label>Nombre</label><input type="text" value="PEREZ*ARANDA,SERGIO" /></div></div><br/>
 					
@@ -527,7 +578,7 @@
 				</div></div></div>
 				<br/>
 				
-				<div class="control p100"><div><div class="groupbox"><span class="leyenda">Cuentas bancarias</span><div class="clear"></div>
+				<div class="control p100"><div><div class="groupbox"><span class="legend">Cuentas bancarias</span><div class="clear"></div>
 				
 					#Grid cuentas bancarias#
 					
@@ -546,67 +597,67 @@
                 
                     <div class='control' style='width:30%;' ><div >
                         <label>Textbox</label>
-                        <input id='' value='Pepe' />
+                        <input class="text" id='' value='Pepe' />
                     </div></div>
                     
                     <div class='control' style='width:30%;' ><div >
                             <label>La etiqueta mas larga del mundo</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:30%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:30%;' ><div >
                             <label>La etiquet</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:30%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:30%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:30%;' ><div >
                             <label>Etiqueta muy larga</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:30%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:10%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
 
                     <div class='control' style='width:10%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
                     
                     <div class='control' style='width:10%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
                     
                     <div class='control' style='width:20%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
                     
                     <div class='control' style='width:20%;' ><div >
                             <label>Textbox</label>
-                            <input id='' value='Pepe' />
+                            <input class="text" id='' value='Pepe' />
                     </div></div>
                     
                      <div class="clear"></div>
@@ -685,7 +736,7 @@
                     <div class="clear"></div>
                     
                     <div class='control' style='width:50%;' ><div>
-                    <table class="grid_js">
+                    <table class="grid">
                         <th>Columna 1</th><th>Columna 2</th><th>Columna 3</th><th>Columna 4</th><th>Columna 5</th>
                         <tr>
                             <td>Dato 1</td><td>Dato 2</td><td>Dato 3</td><td>Dato 4</td><td>Dato 5</td>
@@ -758,6 +809,71 @@
 </body>
 <script>
 
+// Components
+
+var t = types;
+var c = components;
+
+var Actor = Model.create({
+    table: "actor",
+    pk: "actor_id",
+    properties: {
+        "actor_id": t.Number(5),
+        "first_name": t.String(45),
+        "last_name": t.String(45),
+        "last_update": t.Date(),
+        "film_debutted_id": t.Number(5),
+        // "film_debutted": t.Relation1({ model: "film", own: "film_debutted_id" }),
+        // "films_actors": t.RelationN({ model: "film_actor", other: "actor_id" }),
+        "languages": t.RelationN({ model: "language", other: "actor_id" })
+    }
+});
+
+var Language = new Model.create({
+    table: "language",
+    pk: "language_id",
+    properties: {
+        "language_id": t.Number(3),
+        "name": t.String(20)
+        
+    }
+});
+
+var theActor = new Actor({first_name: "Pepe", film_debutted_id: 98132, languages: [
+    { "language_id": 1, "name": "English" },
+    { "language_id": 2, "name": "Italian" },
+    { "language_id": 3, "name": "Japanese" },
+    { "language_id": 4, "name": "Mandarin" },
+    { "language_id": 5, "name": "French" },
+    { "language_id": 6, "name": "German" }
+]});
+
+var form = new c.Form({name: "form1", width: "60%"}, [ 
+        c.Input({name: "actor_id", width: "30%"}),
+        c.NewLine(), 
+        c.Input({name: "first_name", width: "30%"}), 
+        c.Input({name: "last_name", width: "30%"}),
+        c.SimpleGrid({name: "languages", width: "60%"}),
+        c.NewLine(), 
+        c.Input({name: "1_first_name", width: "30%"}), 
+        c.Input({name: "2_first_name", width: "30%"}), 
+        c.NewLine(), 
+        c.Input({name: "3_first_name", width: "30%"}), 
+        c.Input({name: "4_first_name", width: "30%"}), 
+        c.NewLine(), 
+        c.Input({name: "5_first_name", width: "30%"}), 
+        c.Input({name: "6_first_name", width: "30%"}), 
+        c.NewLine(), 
+        c.Input({name: "7_first_name", width: "30%"}), 
+        c.Input({name: "8_first_name", width: "30%"}), 
+        c.NewLine()
+]);
+form.setBinding(theActor);
+document.getElementById("form").innerHTML = form.render();
+form.postRender();
+
+
+// Equate labels length
 var dark_ui = document.getElementById("dark-ui");
 var labels = dark_ui.getElementsByTagName("label");
 var maxWidth = {};
@@ -781,5 +897,26 @@ for (var i = 0; i < labels.length; i++) {
 // Reset UI, needed in webkit to redraw controls properly
 dark_ui.style.display = "none";
 setTimeout(function() { dark_ui.style.display = ""; });
+
+// Tabset
+var tabset_onclick = function(li, lis) {
+    return function() {
+        for (var i = 0; i < lis.length; i++) {
+            removeClass(lis[i], "sel");
+        }
+        addClass(li, "sel");
+    }
+}
+
+var tabsets = getElementsByClassName(document, "tabset");
+for (var i = 0; i < tabsets.length; i++) {
+    var tabset = tabsets[i];
+    var lis = tabset.getElementsByTagName("li");
+    for (var j = 0; j < lis.length; j++) {
+        var li = lis[j];
+        li.getElementsByTagName("a")[0].onclick = tabset_onclick(li, lis);
+    }
+}
+
 </script>
 </html>

@@ -98,12 +98,14 @@ Component.prototype.setParent = function(parent) {
 
 Component.idCounter = 1;
 Component.prototype.getId = function() {
-    // if (!this.id_) {
-    //     this.id_ = "id#" + Component.idCounter++;
-    // }
-    // else {
+    if (!this.id_) {
+      if (typeof this.getName() === "undefined") {
+        this.id_ = "id#" + Component.idCounter++;
+      }
+      else {
         this.id_ =  this.getNamespace() + this.getName();
-    // }
+      }
+    }
     return this.id_;
 };
 
@@ -671,18 +673,19 @@ Form.prototype.postRender = function() {
         if (i < this_.selected_.length) {   // Move mode
         
            var control = uniqueSelected.getElement().parentNode.parentNode;
+           var controlLimits = getOffset(control);
            var dropPosition = null;
            
            document.onmousemove = function(e) {
                 var event = e || window.event;
                 var target = event.target || event.srcElement;
                 var descendant = this_.descendantFromElement(target);
+                control.style.left = e.clientX - controlLimits.left /*- initialX*/ + 20 + "px";
+                control.style.top = e.clientY - controlLimits.top /*- initialY*/ + 20 +"px";
+                control.style.opacity = .4;
                 if (descendant && descendant != uniqueSelected) {
-                  control.style.left = e.clientX - initialX + "px";
-                  control.style.top = e.clientY - initialY + "px";
-                  control.style.opacity = .4;
                   console.log(control.style.left, control.style.top);
-                  dropPosition = this_.renderDropCaret(descendant, e.clientX, e.clientY);
+                  dropPosition = this_.renderDropCaret(descendant, e.clientX, e.clientY, uniqueSelected);
                 }
             };
             document.onmouseup = function(e) {
@@ -708,7 +711,7 @@ Form.prototype.postRender = function() {
                                 target = previousSibling;
                                 previousSibling = targetParent.previousSibling(target);
                             }
-                            if (!previousSibling) {
+                            if (!previousSibling || (targetParent.previousSibling(previousSibling) && !targetParent.previousSibling(previousSibling).isNewLine)) {
                                 target = targetParent.insert(new NewLine(), target, false);
                             }
                             else {
@@ -721,7 +724,7 @@ Form.prototype.postRender = function() {
                                 target = nextSibling;
                                 nextSibling = targetParent.nextSibling(target);
                             }
-                            if (!nextSibling) {
+                            if (!nextSibling || (targetParent.nextSibling(nextSibling) && !targetParent.nextSibling(nextSibling).isNewLine)) {
                                 target = targetParent.insert(new NewLine(), target, true);
                             }
                             else {
@@ -786,7 +789,7 @@ Form.prototype.postRender = function() {
     });
 };
 
-Form.prototype.renderDropCaret = function(descendant, x, y) {
+Form.prototype.renderDropCaret = function(descendant, x, y, uniqueSelected) {
     var dropCaret = getElementsByClassName(this.getElement(), "drop-caret")[0];
     dropCaret.style.display = "";
     console.log(dropCaret);
@@ -802,19 +805,21 @@ Form.prototype.renderDropCaret = function(descendant, x, y) {
         console.log(dropCaret.left, dropCaret.top, dropCaret.height, dropCaret.width);
     }
     else {
-        var maxY2 = limits.y2;
+        var maxY2 = limits.y2, maxY1 = limits.y1;
         var parent = descendant.getParent();
         var newLineFound = false;
         if (parent && (dropPosition.top || dropPosition.bottom)) {
             parent.forEachChild(function(childName, child) {
-              if (child.isNewLine) newLineFound = true;
-              var y2 = child.getLimits().y2;
-              if (y2 > maxY2 && !newLineFound) maxY2 = y2;
+              if (child != uniqueSelected) {
+                  if (child.isNewLine) newLineFound = true;
+                  var y2 = child.getLimits().y2;
+                  if (y2 > maxY2 && !newLineFound) maxY2 = y2;
+              }
             });
             limits = parent.getLimits();
         }
         dropCaret.style.left =  -getOffset(dropCaret.parentNode).left + limits.x1 + "px";
-        dropCaret.style.top = -getOffset(dropCaret.parentNode).top + (dropPosition.top ? limits.y1 : maxY2) + "px";
+        dropCaret.style.top = -getOffset(dropCaret.parentNode).top + (dropPosition.top ? maxY1 : maxY2) + "px";
         dropCaret.style.width = limits.x2 - limits.x1 + "px";
         dropCaret.style.height = "4px";
     } 
