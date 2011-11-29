@@ -401,7 +401,7 @@ MultiComponent.prototype.forEachDescendant = function(callback) {
     this.forEachChild(function(childName, child) {
         if (callback) callback(childName, child);
         if (child.isMultiComponent) {
-            this_.forEachDescendant(callback);
+            child.forEachDescendant(callback);
         }
     });
 };
@@ -620,6 +620,49 @@ NewLine.prototype.render = function() {
     return "<br id='" + this.getId() + "' class='new-line' />"; // Not in frame
 };
 
+// Button - example
+
+var Button = function(options) {
+  Component.call(this, options);
+};
+inherits(Button, Component);
+
+exports.Button = function(options) { return new Button(options); };
+
+Button.prototype.template = tmpl(
+    "<button id='<%=getId()%>' ><span><%=getName() %></span></button>"
+);
+
+// Groupbox
+
+var Groupbox = function(options, children) {
+  MultiComponent.call(this, options, children);
+  this.selected_ = [];
+};
+inherits(Groupbox, MultiComponent);
+
+Groupbox.prototype.internalRender = function() {
+    var html = "<div id='" + this.getId() + "' class='groupbox'>";
+    html += "<span class='legend'>" + this.getName() + "</span>";
+    this.forEachChild(function(childName, child) {
+        html += child.render();
+    });
+    html += "<div class='clear'></div>";
+    html += "</div>";
+    return html;
+};
+
+Groupbox.prototype.setBinding = function(record, propertyMap) {
+    MultiComponent.prototype.setBinding.call(this, record);
+    this.forEachChild(function(childName, child) {
+        // Lookup property name on passed property map
+        // By default bind each child with the same named property
+        child.setBinding(record, propertyMap && propertyMap[childName] ? propertyMap[childName] : childName);
+    });
+};
+
+exports.Groupbox = function(options, children) { return new Groupbox(options, children); };
+
 // Form
 
 var Form = function(options, children) {
@@ -675,13 +718,17 @@ Form.prototype.postRender = function() {
            var control = uniqueSelected.getElement().parentNode.parentNode;
            var controlLimits = getOffset(control);
            var dropPosition = null;
+           var selectionMark = getElementsByClassName(control, "selection-mark")[0];
            
            document.onmousemove = function(e) {
                 var event = e || window.event;
                 var target = event.target || event.srcElement;
                 var descendant = this_.descendantFromElement(target);
-                control.style.left = e.clientX - controlLimits.left /*- initialX*/ + 20 + "px";
-                control.style.top = e.clientY - controlLimits.top /*- initialY*/ + 20 +"px";
+                var dx = e.clientX - controlLimits.left + 20, dy = e.clientY - controlLimits.top + 20;
+                control.style.left = dx + "px";
+                control.style.top = dy +"px";
+                selectionMark.style.left = -dx -4 + "px";
+                selectionMark.style.top = -dy + "px";
                 control.style.opacity = .4;
                 if (descendant && descendant != uniqueSelected) {
                   console.log(control.style.left, control.style.top);
@@ -695,9 +742,11 @@ Form.prototype.postRender = function() {
                 
                 var dropCaret = getElementsByClassName(this_.getElement(), "drop-caret")[0];
                 dropCaret.style.display = "none";
-                control.style.left = 0;
-                control.style.top = 0;
-                control.style.opacity = 1;
+                control.style.left = null;
+                control.style.top = null;
+                selectionMark.style.left = null;
+                selectionMark.style.top = null;
+                 control.style.opacity = 1;
                 
                 // Do the move
                 if (dropPosition) {

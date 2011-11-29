@@ -848,11 +848,23 @@ var theActor = new Actor({first_name: "Pepe", film_debutted_id: 98132, languages
     { "language_id": 6, "name": "German" }
 ]});
 
-var form = new c.Form({name: "form1", width: "60%"}, [ 
+var form = new c.Form({name: "form1", width: "100%"}, [ 
         c.Input({name: "actor_id", width: "30%"}),
+        c.NewLine(), 
+        c.Groupbox({name: "Grupo", width: "50%"}, [
+            c.Input({name: "hola", width: "30%"}), 
+            c.Input({name: "adios", width: "30%"})
+        ]),
+        c.NewLine(), 
+        c.Groupbox({name: "Grupo2", width: "50%"}, [
+            c.Input({name: "hola2", width: "30%"}), 
+            c.Input({name: "adios2", width: "30%"}),
+            c.Button({name: "Pulsar", width: "15%"})
+        ]),
         c.NewLine(), 
         c.Input({name: "first_name", width: "30%"}), 
         c.Input({name: "last_name", width: "30%"}),
+        c.NewLine(), 
         c.SimpleGrid({name: "languages", width: "60%"}),
         c.NewLine(), 
         c.Input({name: "1_first_name", width: "30%"}), 
