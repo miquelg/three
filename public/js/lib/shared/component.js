@@ -384,6 +384,16 @@ var MultiComponent = function(options, children) {
 inherits(MultiComponent, Component);
 MultiComponent.prototype.isMultiComponent = true;
 
+MultiComponent.prototype.internalRender = function() {
+    var html = "<div id='" + this.getId() + "' class='MultiComponent' >";
+    this.forEachChild(function(childName, child) {
+        html += child.render();
+    });
+    html += "<div class='clear'></div>";
+    html += "</div>";
+    return html;
+};
+
 MultiComponent.prototype.getChildren = function() {
   return this.children_;
 };
@@ -415,24 +425,20 @@ MultiComponent.prototype.assignVariablesFromParams = function(params) {
     });
 };
 
-MultiComponent.prototype.internalRender = function() {
-    var html = "<div id='" + this.getId() + "' class='MultiComponent'>";
-    this.forEachChild(function(childName, child) {
-        html += child.render();
-    });
-    html += "<div class='clear'></div>";
-    html += "<div class='multi-select'></div>";     // TODO: solo form / Form
-    html += "<div class='dimension-x'></div>";
-    html += "<div class='dimension-y'></div>";
-    html += "<div class='drop-caret'></div>";
-    html += "</div>";
-    return html;
-};
 
 MultiComponent.prototype.postRender = function() {
     Component.prototype.postRender.call(this);
     this.forEachChild(function(childName, child) {
         child.postRender();
+    });
+};
+
+MultiComponent.prototype.setBinding = function(record, propertyMap) {
+    Component.prototype.setBinding.call(this, record);
+    this.forEachChild(function(childName, child) {
+        // Lookup property name on passed property map
+        // By default bind each child with the same named property
+        child.setBinding(record, propertyMap && propertyMap[childName] ? propertyMap[childName] : childName);
     });
 };
 
@@ -534,7 +540,9 @@ MultiComponent.prototype.insert = function(newChild, referenceChild, after) {
 //
 MultiComponent.prototype.descendantFromElement = function(elem) {
     while (elem) {
+        // if (elem.className === "selection-mark") elem = elem.previousSibling;  // Kludge !!!
         if (elem.isComponent) {
+            console.log(elem.id);
             return this.descendantFromId(elem.id);
         }
         elem = elem.parentNode;
@@ -652,16 +660,76 @@ Groupbox.prototype.internalRender = function() {
     return html;
 };
 
-Groupbox.prototype.setBinding = function(record, propertyMap) {
-    MultiComponent.prototype.setBinding.call(this, record);
+exports.Groupbox = function(options, children) { return new Groupbox(options, children); };
+
+// Tabset
+
+var Tabset = function(options, children) {
+  MultiComponent.call(this, options, children);
+  this.selected_ = [];
+};
+inherits(Tabset, MultiComponent);
+
+Tabset.prototype.internalRender = function() {
+    var this_ = this;
+    var id = this.getId();
+    var html = "<div id='" + id + "' class='" + this.getOption("css") + "' >";
+    html += "<ul>";
+    var first, last;
     this.forEachChild(function(childName, child) {
-        // Lookup property name on passed property map
-        // By default bind each child with the same named property
-        child.setBinding(record, propertyMap && propertyMap[childName] ? propertyMap[childName] : childName);
+        if (!first) first = childName;
+        last = childName;
     });
+    this.forEachChild(function(childName, child) {
+        html += "<li id='" + child.getId() + ".tab" + "' class='" + 
+            (childName == first ? "sel first " : "") +
+            (childName == last ? "last " : "") + "' >" + 
+            "<a href='#'><span>" + childName + "</span></a></li>";
+    });
+    // html += "<div class='clear'></div>";
+    html += "</ul>";
+    this.forEachChild(function(childName, child) {
+        child.setOption("width", "100%"); 
+        html += "<div class='" + this_.getOption("css") + "-body " + (childName == first ? "sel " : "") + "' >";
+        html += child.render(); // child.internalRender();     // No frame
+        html += "<div class='clear'></div>";
+        html += "</div>";
+    });
+    html += "</div>";
+    return html;
 };
 
-exports.Groupbox = function(options, children) { return new Groupbox(options, children); };
+Tabset.prototype.postRender = function() {
+    this.forEachChild(function(childName, child) {
+        var tab = document.getElementById(child.getId() + ".tab");
+        var lis = tab.parentNode.getElementsByTagName("LI");
+        var body = child.getElement().parentNode;
+        var bodies = body.parentNode.getElementsByTagName("DIV");
+        tab.onclick = function() {
+            for (var i = 0; i < lis.length; i++) {
+                removeClass(lis[i], "sel");
+            }
+            addClass(tab, "sel");
+            for (i = 0; i < bodies.length; i++) {
+                removeClass(bodies[i], "sel");
+                // bodies[i].style.display = "none";
+            }
+            addClass(body, "sel");
+            // body.style.display = "block";
+        };
+    });
+  };
+
+
+exports.Tabset = function(options, children) { return new Tabset(options, children); };
+
+var Tab = function(options, children) {
+  MultiComponent.call(this, options, children);
+  this.selected_ = [];
+};
+inherits(Tab, MultiComponent);
+
+exports.Tab = function(options, children) { return new Tab(options, children); };
 
 // Form
 
@@ -673,18 +741,24 @@ inherits(Form, MultiComponent);
 
 exports.Form = function(options, children) { return new Form(options, children); };
 
-Form.prototype.setBinding = function(record, propertyMap) {
-    MultiComponent.prototype.setBinding.call(this, record);
-    this.forEachChild(function(childName, child) {
-        // Lookup property name on passed property map
-        // By default bind each child with the same named property
-        child.setBinding(record, propertyMap && propertyMap[childName] ? propertyMap[childName] : childName);
-    });
-};
-
 /*Form.prototype.getNamespace = function() {
     return this.getParent() && this.getParent().getNamespace() != "" ? this.getParent().getNamespace() + "." + this.getName() : this.getName();
 };*/
+
+
+Form.prototype.internalRender = function() {
+    var html = "<div id='" + this.getId() + "' class='MultiComponent'>";
+    this.forEachChild(function(childName, child) {
+        html += child.render();
+    });
+    html += "<div class='clear'></div>";
+    html += "<div class='multi-select'></div>";     // TODO: solo form / Form
+    html += "<div class='dimension-x'></div>";
+    html += "<div class='dimension-y'></div>";
+    html += "<div class='drop-caret'></div>";
+    html += "</div>";
+    return html;
+};
 
 Form.prototype.postRender = function() {
     
@@ -724,6 +798,7 @@ Form.prototype.postRender = function() {
                 var event = e || window.event;
                 var target = event.target || event.srcElement;
                 var descendant = this_.descendantFromElement(target);
+                console.log(target, descendant);
                 var dx = e.clientX - controlLimits.left + 20, dy = e.clientY - controlLimits.top + 20;
                 control.style.left = dx + "px";
                 control.style.top = dy +"px";
@@ -847,6 +922,7 @@ Form.prototype.renderDropCaret = function(descendant, x, y, uniqueSelected) {
     var limits = descendant.getLimits();
     console.log(dropPosition, limits);
     if (dropPosition.left || dropPosition.right) {
+        console.log("Limites Y: ", limits.y1, limits.y2);
         dropCaret.style.left = -getOffset(dropCaret.parentNode).left + (dropPosition.left || dropPosition.right) + "px";
         dropCaret.style.top = -getOffset(dropCaret.parentNode).top + limits.y1 + "px";
         dropCaret.style.height = limits.y2 - limits.y1 + "px";

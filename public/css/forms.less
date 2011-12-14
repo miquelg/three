@@ -18,7 +18,9 @@
 	margin-right: 10px;
 }
 
-.control > div > input, .control > div > select, .control > div > .groupbox, .control > div > textarea, .control > div > button {
+.control > div > input, .control > div > select, .control > div > .groupbox, 
+.control > div > textarea, .control > div > button, .control > div > .tabset
+{
 	width: 100%;
 }
 
@@ -149,12 +151,36 @@ input.text, textarea { /* display: block; */
 */
 
 .tabset {
-    margin: 0;
-	padding: 0;
-    
+    text-align: center;
+    background: url(../img/tabset-bg.png) repeat-x top left;
 }
 
-.tabset li {
+.tabset-body {
+    display: none;
+    clear: left;
+    border: 0;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    margin: 0;
+    padding: 10px;
+    margin-top: -3px;       // TODO: kludge
+}
+
+.tabset-body.sel {
+    display: block;
+}
+
+.tabset > ul {
+    margin: 0;
+    margin-left: 9px;
+	padding: 0;
+    display: inline-block;
+    text-align: left;
+    margin: 0 auto;
+}
+
+.tabset > ul li {
     position: relative;
 	display: block;
 	float: left;
@@ -162,51 +188,62 @@ input.text, textarea { /* display: block; */
     margin-left: -9px;
 }
 
-.tabset li.first {
+.tabset > ul li.first {
     background: url(../img/tabset-first-left.png) no-repeat top left;
 }
 
-.tabset li.last a  {
+.tabset > ul li.last a  {
     background: url(../img/tabset-last-right.png) no-repeat top right;
 }
 
-.tabset li.sel {
+.tabset > ul li.sel {
     background: url(../img/tabset-sel-left.png) no-repeat top left;
 }
 
-.tabset li.sel.first {
+.tabset > ul li.sel.first {
     background: url(../img/tabset-sel-first-left.png) no-repeat top left;
 }
 
-.tabset li.sel.last a  {
+.tabset > ul li.sel.last a  {
     background: url(../img/tabset-sel-last-right.png) no-repeat top right;
 }
 
-.tabset li a {
+.tabset > ul li a {
 	display: block;
 	background: transparent url(../img/tabset-right.png) no-repeat top right;
 	text-decoration: none;
 	cursor: pointer;
 }
 
-.tabset li.sel a {
+.tabset > ul li.sel a {
 	background: url(../img/tabset-sel-right.png) no-repeat top right;
 }
 
-.tabset li a span {
+.tabset > ul li a span {
 	display: block;
-	height: 23px;
+	height: 17px;
 	padding-left: 15px;
 	padding-right: 24px;    /* 15+9 */
-	padding-top: 5px;
+	padding-top: 6px;
 	text-decoration: none;
-	color: #6c8c37;
+    font-size: 11px;
+	color: #555;
 	cursor: pointer;
 }
 
-.tabset li.sel a span {
-	color: #f47b2a;
+.tabset > ul li a:hover span {
+    // text-decoration: underline;
+    color: #111;
+}
 
+.tabset > ul li.sel a span {
+	// color: #f47b2a;
+    font-weight: bold;
+}
+
+.tabset > ul li.sel a:hover span {
+    text-decoration: none;
+    color: #555;
 }
 
 /* button */
@@ -465,6 +502,7 @@ button.boton span {
 }
 
 .dimension-x {
+    display: none;
     position: absolute;
     text-align: center;
     background: url(../img/dimension-background.png) repeat-x left center;
@@ -485,6 +523,7 @@ button.boton span {
 }
 
 .dimension-y {
+    display: none;
     position: absolute;
     text-align: center;
     background: url(../img/dimension-background.png) repeat-y center top;

@@ -45,9 +45,12 @@ div.sidebar {
         position: relative;
         background: @subheaderBkColor;
         height: @subheaderHeight;
-        ul.tabs {
+        > ul {
           li {
             a {
+              width: 30px;
+              padding: 0 2px;
+              text-align: center;
               margin: 0 1px 0 2px;
               background-color: #aaa;
               color: #333;
@@ -55,7 +58,7 @@ div.sidebar {
                 background-color: #bbb;
               }
             }
-            &.active a {
+            &.sel a {
               background-color: #ddd;
               color: #333;
              }
@@ -123,7 +126,7 @@ div.main {
 
 }
 
-ul.tabs {
+div.tabsbar > ul {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -148,7 +151,7 @@ ul.tabs {
         background-color: #ccc;
       }
     }
-    &.active a {
+    &.sel a {
       background-color: #ebebeb;
       padding: 0 14px;
       border-bottom: 0;

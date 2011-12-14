@@ -44,8 +44,8 @@
         <div class="main">
             <div class="tabsbar">
             
-                   <ul class="tabs">
-                           <li class="active"><a href="#">Clientes</a></li>
+                   <ul >
+                           <li class="sel"><a href="#">Clientes</a></li>
                            <li><a href="#">Proveedores</a></li>
                            <li><a href="#">Inventario</a></li>
                            <li><a href="#">Stock</a></li>
@@ -66,6 +66,41 @@
                 <div id="form" ></div>
                 <div class="clear"></div>
                 
+        <br/>
+                
+        <div class="tabset">
+            <ul id="pestanya_ayuda_domicilio" >  
+        	    <li class="sel first" ><a pestanya="Unidad familiar" ><span>Unidad familiar</span></a></li>  
+    		    <li><a pestanya="Hábitat" ><span>Hábitat</span></a></li>  
+    		    <!-- li><a pestanya="Comisiones" ><span>Comisiones</span></a></li>  
+    		    <li><a pestanya="Servicios" ><span>Servicios</span></a></li>  
+    		    <li><a pestanya="Suspensiones" ><span>Suspensiones</span></a></li>  
+    		    <li><a pestanya="Situación administrativa" ><span>Situación administrativa</span></a></li -->
+    		    <li class="last" ><a pestanya="Datos económicos" ><span>Datos económicos</span></a></li>  
+            </ul>
+            <div class="tab">
+                <div class='control' style='width:30%;' ><div>
+                    <label>Textbox</label>
+                    <input class="text" id='' value='Pepe' />
+                </div></div>
+                
+                <div class='control' style='width:30%;' ><div>
+                    <label>Textbox</label>
+                    <input class="text" id='' value='Pepe' />
+                </div></div>
+                
+                <br/>
+                <div class='control' style='width:30%;' ><div>
+                    <label>Textbox</label>
+                    <input class="text" id='' value='Pepe' />
+                </div></div>
+                
+                <br/>
+            </div>
+        </div>
+
+    <div class="clear"></div>
+
                 <div class='control' style='width:30%;' ><div>
                     <label>Textbox</label>
                     <input class="text" id='' value='Pepe' />
@@ -208,8 +243,8 @@
 		
 		<br/>
 
-        <div class="Tabset_div">
-        <ul id="pestanya_ayuda_domicilio" class="tabset">  
+        <div class="tabset">
+        <ul id="pestanya_ayuda_domicilio" >  
 		    <li class="sel first" ><a pestanya="Unidad familiar" ><span>Unidad familiar</span></a></li>  
 		    <li><a pestanya="Hábitat" ><span>Hábitat</span></a></li>  
 		    <li><a pestanya="Comisiones" ><span>Comisiones</span></a></li>  
@@ -222,8 +257,8 @@
 		
 		<div id="Unidad familiar" class="tabbody" >
 		
-            <div class="Tabset_div">
-			<ul id="pestanya_unidad_familiar" class="tabset">  
+            <div class="tabset">
+			<ul id="pestanya_unidad_familiar" >  
 		    	<li class="first"><a pestanya="Datos de usuarios" ><span>Datos de usuarios</span></a></li>  
 		    	<li class="sel" ><a pestanya="Persona contacto" ><span>Persona contacto</span></a></li>  
 		    	<li class="last" ><a pestanya="Datos socio-sanitarios" ><span>Datos socio-sanitarios</span></a></li>  
@@ -768,14 +803,14 @@
             
         </div>
         <div class="sidebar">
-            <div class="tabsbar">
-                   <ul class="tabs">
-                           <li class="active"><a href="#">x</a></li>
+            <div id="tabsbar">
+                   <!-- ul>
+                           <li class="sel"><a href="#">x</a></li>
                            <li><a href="#">x</a></li>
                            <li><a href="#">x</a></li>
                            <li><a href="#">x</a></li>
                            <li><a href="#">x</a></li>
-                  </ul>            
+                  </ul -->            
             </div>
             <div class="content">
                    <ul class="select-pane">
@@ -848,6 +883,25 @@ var theActor = new Actor({first_name: "Pepe", film_debutted_id: 98132, languages
     { "language_id": 6, "name": "German" }
 ]});
 
+var Widget = new Model.create({
+    table: "widget",
+    pk: "widget_id",
+    properties: {
+        "widget_id": t.Number(3),
+        "name": t.String(20),
+        "class": t.String(20),
+        "icon": t.String(100)
+    }
+});
+
+var widgets = new Collection(Widget.getModel(), [
+    { "widget_id": 1, "name": "Text"   , "class": "Input", "icon": "" },
+    { "widget_id": 2, "name": "Groupbox", "class": "Groupbox", "icon": "" },
+    { "widget_id": 3, "name": "Button", "class": "Button", "icon": "" },
+    { "widget_id": 4, "name": "Tab", "class": "Tab", "icon": "" },
+    { "widget_id": 5, "name": "Simplegrid", "class": "SimpleGrid", "icon": "" },
+]);
+
 var form = new c.Form({name: "form1", width: "100%"}, [ 
         c.Input({name: "actor_id", width: "30%"}),
         c.NewLine(), 
@@ -862,10 +916,21 @@ var form = new c.Form({name: "form1", width: "100%"}, [
             c.Button({name: "Pulsar", width: "15%"})
         ]),
         c.NewLine(), 
+        c.Tabset({name: "Tabset", width: "50%", css: "tabset" } , [
+            c.Tab({name: "Pestaña 1", width: "30%"}, [c.Input({name: "erwerer", width: "30%"})] ), 
+            c.Tab({name: "Pestaña 2", width: "30%"}, [c.Input({name: "234902034", width: "30%"})] ),
+            c.Tab({name: "Pestaña 3", width: "15%"}, [c.Input({name: "fsdfsdf", width: "30%"})] )
+        ] ),
+        c.NewLine(), 
         c.Input({name: "first_name", width: "30%"}), 
         c.Input({name: "last_name", width: "30%"}),
         c.NewLine(), 
         c.SimpleGrid({name: "languages", width: "60%"}),
+        c.NewLine(), 
+        c.Button({name: "Botón1", width: "15%"}),
+        c.Button({name: "Botón2", width: "15%"}),
+        c.Button({name: "Botón3", width: "15%"}),
+        c.Button({name: "Botón4", width: "15%"}),
         c.NewLine(), 
         c.Input({name: "1_first_name", width: "30%"}), 
         c.Input({name: "2_first_name", width: "30%"}), 
@@ -911,6 +976,7 @@ dark_ui.style.display = "none";
 setTimeout(function() { dark_ui.style.display = ""; });
 
 // Tabset
+/*
 var tabset_onclick = function(li, lis) {
     return function() {
         for (var i = 0; i < lis.length; i++) {
@@ -929,6 +995,17 @@ for (var i = 0; i < tabsets.length; i++) {
         li.getElementsByTagName("a")[0].onclick = tabset_onclick(li, lis);
     }
 }
+*/
+
+// Render factory UI
+
+var tabsbar = c.Tabset({name: "Tabsbar", width: "100%", css: "tabsbar" } , [
+            c.Tab({ name: "a" } ), 
+            c.Tab({ name: "b" } ),
+            c.Tab({ name: "c" } )
+        ] );
+getElementsByClassName(document, "sidebar")[0].getElementsByTagName("div")[0].innerHTML = tabsbar.render();     // TODO: better way
+tabsbar.postRender();
 
 </script>
 </html>
